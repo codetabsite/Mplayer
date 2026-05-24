@@ -1,6 +1,6 @@
 # MPlayer ♪
 
-Minimal black MP3 player for Android.  
+Minimal Bir MP3 Çalar Android İçin.  
 `com.tdev.mplayr` — no ads, no bloat.
 
 ---
