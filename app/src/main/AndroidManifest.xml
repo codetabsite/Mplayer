@@ -31,10 +31,19 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.NowPlayingActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
         <service
             android:name=".service.PlayerService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
+
+        <receiver
+            android:name=".service.SleepTimerReceiver"
+            android:exported="false" />
 
     </application>
 
