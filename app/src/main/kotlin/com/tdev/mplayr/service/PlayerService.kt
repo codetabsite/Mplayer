@@ -205,7 +205,7 @@ class PlayerService : Service() {
             .setSmallIcon(R.drawable.ic_note)
             .setContentTitle(song.title)
             .setContentText(song.artist)
-            .setLargeIcon(null)
+            .setLargeIcon(null as android.graphics.Bitmap?)
             .setContentIntent(openPi)
             .addAction(R.drawable.ic_prev, "Prev", pi(ACTION_PREV))
             .addAction(playIcon, if (isPlaying) "Pause" else "Play", pi(playAction))
