@@ -10,7 +10,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
     }
 }
-rootProject.name = "MPlayer"
+
+rootProject.name = "Mplayer"
 include(":app")
