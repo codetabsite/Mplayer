@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg"
+    android:paddingHorizontal="24dp">
+
+    <!-- Toolbar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            android:tint="@color/text_primary" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Şimdi Çalıyor"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <ImageButton
+            android:id="@+id/btnFav"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_fav_off"
+            android:tint="@color/accent" />
+    </LinearLayout>
+
+    <!-- Albüm kapağı -->
+    <ImageView
+        android:id="@+id/ivArt"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginVertical="12dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_note"
+        android:background="@color/surface" />
+
+    <!-- Şarkı bilgisi + Hız etiketi -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="—"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:ellipsize="end"
+                android:singleLine="true" />
+
+            <TextView
+                android:id="@+id/tvArtist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/text_dim"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Hız butonu -->
+        <TextView
+            android:id="@+id/tvSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1×"
+            android:textColor="@color/accent"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="6dp"
+            android:background="@color/surface"
+            android:layout_marginStart="8dp"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <!-- SeekBar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/tvPos"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="0:00"
+            android:textColor="@color/text_dim"
+            android:textSize="12sp" />
+
+        <SeekBar
+            android:id="@+id/seek"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:thumbTint="@color/accent"
+            android:progressTint="@color/accent"
+            android:progressBackgroundTint="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvDur"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="0:00"
+            android:textColor="@color/text_dim"
+            android:textSize="12sp"
+            android:gravity="end" />
+    </LinearLayout>
+
+    <!-- Ana kontroller -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp">
+
+        <ImageButton
+            android:id="@+id/btnPrev"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_prev"
+            android:tint="@color/text_primary" />
+
+        <ImageButton
+            android:id="@+id/btnPlay"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:background="@drawable/bg_play_btn"
+            android:src="@drawable/ic_play"
+            android:tint="@color/bg"
+            android:layout_marginHorizontal="16dp" />
+
+        <ImageButton
+            android:id="@+id/btnNext"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_next"
+            android:tint="@color/text_primary" />
+    </LinearLayout>
+
+    <!-- Alt araçlar: EQ + Sleep -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp">
+
+        <ImageButton
+            android:id="@+id/btnEq"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_eq"
+            android:tint="@color/text_dim"
+            android:layout_marginHorizontal="24dp" />
+
+        <ImageButton
+            android:id="@+id/btnSleep"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_sleep"
+            android:tint="@color/text_dim"
+            android:layout_marginHorizontal="24dp" />
+    </LinearLayout>
+
+</LinearLayout>
