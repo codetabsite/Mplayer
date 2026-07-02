@@ -105,20 +105,80 @@ class StatsActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             val unlocked = db.achievementDao().getUnlockedIds().toSet()
+            val progressList = AchievementManager.getProgress(db)
             val achContainer = findViewById<LinearLayout>(R.id.achContainer)
             runOnUiThread {
                 achContainer.removeAllViews()
                 AchievementManager.all.forEach { ach ->
-                    val tv = TextView(this@StatsActivity).apply {
-                        val done = ach.id in unlocked
-                        text = "${if (done) ach.emoji else "🔒"} ${ach.title}"
-                        setTextColor(if (done) 0xFFFFFFFF.toInt() else 0xFF666666.toInt())
-                        textSize = 14f
-                        setPadding(0, 8, 0, 8)
+                    val done = ach.id in unlocked
+                    // [15] Gizli başarım kilitliyken isim/açıklama "???" gösterilir
+                    val displayTitle = if (ach.hidden && !done) "??? (Gizli Başarım)" else ach.title
+                    val displayEmoji = if (done) ach.emoji else "🔒"
+
+                    val row = LinearLayout(this@StatsActivity).apply {
+                        orientation = LinearLayout.VERTICAL
+                        setPadding(0, 10, 0, 10)
                     }
-                    achContainer.addView(tv)
+                    val tv = TextView(this@StatsActivity).apply {
+                        text = "$displayEmoji $displayTitle"
+                        setTextColor(if (done) 0xFFFFFFFF.toInt() else 0xFF888888.toInt())
+                        textSize = 14f
+                    }
+                    row.addView(tv)
+
+                    // [14] Başarılar için ilerleme çubuğu (gizli+kilitli başarımlarda gösterilmez)
+                    val progress = progressList.find { it.achievement.id == ach.id }
+                    if (progress != null && !(ach.hidden && !done)) {
+                        val bar = android.widget.ProgressBar(
+                            this@StatsActivity, null, android.R.attr.progressBarStyleHorizontal
+                        ).apply {
+                            max = 100
+                            this.progress = progress.percent
+                            layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT, 12.dpToPx()
+                            ).apply { topMargin = 6 }
+                        }
+                        row.addView(bar)
+                        val pctText = TextView(this@StatsActivity).apply {
+                            text = "${progress.percent}% (${progress.currentValue}/${progress.targetValue})"
+                            setTextColor(0xFF666666.toInt())
+                            textSize = 11f
+                        }
+                        row.addView(pctText)
+                    }
+                    achContainer.addView(row)
                 }
             }
+        }
+
+        // [16] Tür Dağılımı Pasta Grafiği
+        lifecycleScope.launch {
+            val genreCounts = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                val songs = com.tdev.mplayr.data.MusicLoader.loadAll(this@StatsActivity)
+                songs.groupBy { it.genre }
+                    .map { it.key to it.value.size }
+                    .sortedByDescending { it.second }
+                    .take(8)
+            }
+            if (genreCounts.isNotEmpty()) {
+                val chart = GenrePieChart(this@StatsActivity, genreCounts)
+                val container = findViewById<LinearLayout>(R.id.genreChartContainer)
+                container.removeAllViews()
+                container.addView(chart, LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 220.dpToPx()
+                ))
+            }
+        }
+
+        // [20] 6 Aydır Dinlenmeyenler (Unutulanlar)
+        val rvForgotten = findViewById<RecyclerView>(R.id.rvForgotten)
+        rvForgotten.layoutManager = LinearLayoutManager(this)
+        val forgottenAdapter = MostPlayedAdapter()
+        rvForgotten.adapter = forgottenAdapter
+        lifecycleScope.launch {
+            val sixMonthsAgo = System.currentTimeMillis() - 182L * 86_400_000L
+            val forgotten = histDao.getForgottenSongs(sixMonthsAgo)
+            forgottenAdapter.setData(forgotten)
         }
     }
 

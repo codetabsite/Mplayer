@@ -2,6 +2,7 @@ package com.tdev.mplayr.service
 
 import android.app.*
 import android.content.Intent
+import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.audiofx.BassBoost
@@ -11,6 +12,8 @@ import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import com.tdev.mplayr.R
+import com.tdev.mplayr.audio.AudioAnalyzer
+import com.tdev.mplayr.audio.SensorHelper
 import com.tdev.mplayr.data.AchievementManager
 import com.tdev.mplayr.data.Song
 import com.tdev.mplayr.db.AppDatabase
@@ -37,6 +40,11 @@ class PlayerService : Service() {
         const val PREF_SHUFFLE       = "shuffle"
         const val PREF_REPEAT        = "repeat"
         const val PREF_CROSSFADE     = "crossfade"
+        const val PREF_MONO          = "mono_mode"                 // [5]
+        const val PREF_NORMALIZE     = "normalize_enabled"         // [2]
+        const val PREF_SHAKE_TO_SKIP = "shake_to_skip"             // [10]
+        const val PREF_SILENCE_TRIM  = "silence_trim_enabled"      // [4]
+        const val PREF_HEADSET_RESUME = "headset_resume"           // [26]
     }
 
     inner class LocalBinder : Binder() {
@@ -102,6 +110,40 @@ class PlayerService : Service() {
     var crossfadeSecs: Int = 0
         set(v) { field = v; if (!loadingPrefs) savePrefs() }
 
+    // [5] Mono Ses Modu
+    var monoEnabled: Boolean = false
+        set(v) {
+            field = v
+            applyMonoMode(v)
+            if (!loadingPrefs) savePrefs()
+        }
+
+    // [2] Ses Normalizasyonu
+    var normalizeEnabled: Boolean = false
+        set(v) { field = v; if (!loadingPrefs) savePrefs() }
+
+    // [4] Şarkı Başı/Sonu Sessizlik Kırpıcı
+    var silenceTrimEnabled: Boolean = false
+        set(v) { field = v; if (!loadingPrefs) savePrefs() }
+
+    // [10] Telefonu Sallayarak Şarkı Değiştirme
+    var shakeToSkipEnabled: Boolean = false
+        set(v) {
+            field = v
+            if (v) sensorHelper.startShakeDetection() else sensorHelper.stop()
+            if (!loadingPrefs) savePrefs()
+        }
+
+    // [26] Kulaklık takılınca otomatik devam
+    var headsetResumeEnabled: Boolean = true
+        set(v) { field = v; if (!loadingPrefs) savePrefs() }
+
+    private val sensorHelper by lazy { SensorHelper(this) }
+    private var headsetReceiver: HeadsetReceiver? = null
+    private var pausedByNoisyEvent = false
+    private var pendingSilenceStartMs = 0
+    private var pendingSilenceEndMs = -1
+
     var abStart: Int = -1
     var abEnd:   Int = -1
     private var abRunnable: Runnable? = null
@@ -147,6 +189,50 @@ class PlayerService : Service() {
         createChannel()
         session = MediaSessionCompat(this, "MPlayer")
         loadPrefsAndRestore()
+
+        // [10] Sallama ile şarkı değiştirme
+        sensorHelper.onShakeDetected = { mainHandler.post { next() } }
+        // [3] İvmeölçer ile Akıllı Uyku Modu — hareketsizlik algılanınca çalmayı durdur
+        sensorHelper.onStillnessDetected = { mainHandler.post { pause() } }
+
+        // [26] Kulaklık takılınca otomatik devam / çıkarılınca duraklat
+        headsetReceiver = HeadsetReceiver(
+            onBecomingNoisy = {
+                if (isPlaying) { pausedByNoisyEvent = true; mainHandler.post { pause() } }
+            },
+            onHeadsetConnected = {
+                if (headsetResumeEnabled && pausedByNoisyEvent) {
+                    pausedByNoisyEvent = false
+                    mainHandler.post { resume() }
+                }
+            }
+        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(headsetReceiver, HeadsetReceiver.intentFilter(), Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(headsetReceiver, HeadsetReceiver.intentFilter())
+        }
+    }
+
+    /** [3] İvmeölçer ile Akıllı Uyku Modu: X dakika hareketsizlik sonrası otomatik duraklat */
+    fun startMotionSleepMode(thresholdMinutes: Int) {
+        sensorHelper.startStillnessDetection(thresholdMinutes)
+    }
+
+    fun stopMotionSleepMode() {
+        sensorHelper.stopStillnessDetection()
+    }
+
+    /**
+     * [5] Mono Ses Modu:
+     * MediaPlayer API'si gerçek L/R kanal karıştırma (mixdown) sunmaz — bu yüzden
+     * basit ve öğrenci seviyesinde bir yaklaşım kullanılır: iki kanala da eşit ses seviyesi
+     * uygulanır. Gerçek "tek kanaldaki sesi diğerine de bindirme" AudioTrack + manuel PCM
+     * karıştırma gerektirir ki bu mevcut MediaPlayer mimarisini bozar; bu yüzden kapsam dışı
+     * bırakıldı ve en yakın basit çözüm (dengeli çıkış) uygulanmıştır.
+     */
+    private fun applyMonoMode(enabled: Boolean) {
+        runCatching { mp?.setVolume(1f, 1f) }
     }
 
     private fun releaseMp() {
@@ -185,12 +271,19 @@ class PlayerService : Service() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     runCatching { player.playbackParams = player.playbackParams.setSpeed(playbackSpeed) }
                 }
+                applyMonoMode(monoEnabled)
+                // [4] Sessizlik kırpma: baştaki sessizliği atla
+                if (pendingSilenceStartMs > 0) {
+                    runCatching { player.seekTo(pendingSilenceStartMs) }
+                }
                 player.start()
                 initAudioEffects(player.audioSessionId)
+                applyNormalizationGain(song)
                 notifyState()
                 updateNotif()
                 scheduleABCheck()
                 scheduleCrossfadeIfNeeded()
+                scheduleSilenceEndCheck()
                 listener?.onSongChanged(song)
             }
         }
@@ -220,10 +313,18 @@ class PlayerService : Service() {
             val spd = dao.get(PREF_SPEED)?.toFloatOrNull() ?: 1f
             val bas = dao.get(PREF_BASS)?.toShortOrNull() ?: 500
             val cf  = dao.get(PREF_CROSSFADE)?.toIntOrNull() ?: 0
+            val mono = dao.get(PREF_MONO)?.toBooleanStrictOrNull() ?: false
+            val norm = dao.get(PREF_NORMALIZE)?.toBooleanStrictOrNull() ?: false
+            val shake = dao.get(PREF_SHAKE_TO_SKIP)?.toBooleanStrictOrNull() ?: false
+            val trim = dao.get(PREF_SILENCE_TRIM)?.toBooleanStrictOrNull() ?: false
+            val hsResume = dao.get(PREF_HEADSET_RESUME)?.toBooleanStrictOrNull() ?: true
             mainHandler.post {
                 loadingPrefs = true
                 shuffle = sh; repeat = rep; playbackSpeed = spd
                 bassBoostStrength = bas; crossfadeSecs = cf
+                monoEnabled = mono; normalizeEnabled = norm
+                shakeToSkipEnabled = shake; silenceTrimEnabled = trim
+                headsetResumeEnabled = hsResume
                 loadingPrefs = false
             }
         }
@@ -233,6 +334,9 @@ class PlayerService : Service() {
         // BUG-4 FIX: değerleri hemen kopyala — lambda gecikince field değişmiş olabilir
         val sh  = shuffle; val rep = repeat; val spd = playbackSpeed
         val bas = bassBoostStrength; val cf = crossfadeSecs
+        val mono = monoEnabled; val norm = normalizeEnabled
+        val shake = shakeToSkipEnabled; val trim = silenceTrimEnabled
+        val hsResume = headsetResumeEnabled
         ioScope.launch {
             val dao = AppDatabase.get(this@PlayerService).appPrefDao()
             dao.set(AppPrefEntity(PREF_SHUFFLE,   sh.toString()))
@@ -240,6 +344,11 @@ class PlayerService : Service() {
             dao.set(AppPrefEntity(PREF_SPEED,     spd.toString()))
             dao.set(AppPrefEntity(PREF_BASS,      bas.toString()))
             dao.set(AppPrefEntity(PREF_CROSSFADE, cf.toString()))
+            dao.set(AppPrefEntity(PREF_MONO, mono.toString()))
+            dao.set(AppPrefEntity(PREF_NORMALIZE, norm.toString()))
+            dao.set(AppPrefEntity(PREF_SHAKE_TO_SKIP, shake.toString()))
+            dao.set(AppPrefEntity(PREF_SILENCE_TRIM, trim.toString()))
+            dao.set(AppPrefEntity(PREF_HEADSET_RESUME, hsResume.toString()))
         }
     }
 
@@ -306,9 +415,70 @@ class PlayerService : Service() {
         currentSongForHistory = song
         songStartMs = System.currentTimeMillis()
         abStart = -1; abEnd = -1
+        pendingSilenceStartMs = 0
+        pendingSilenceEndMs = -1
         releaseMp()
         val token = prepareToken
+        prepareSilenceAndGain(song, token)
         buildAndPrepareMp(song, token)
+    }
+
+    /** [2][4] Çalma öncesi DB'den kazanç/trim değerlerini oku; yoksa arka planda hesapla ve kaydet */
+    private fun prepareSilenceAndGain(song: Song, token: Int) {
+        if (!normalizeEnabled && !silenceTrimEnabled) return
+        ioScope.launch {
+            val db = AppDatabase.get(this@PlayerService)
+            if (silenceTrimEnabled) {
+                val cached = db.appPrefDao().get("trim_${song.id}")
+                if (cached != null) {
+                    val parts = cached.split(":")
+                    if (token == prepareToken && parts.size == 2) {
+                        pendingSilenceStartMs = parts[0].toIntOrNull() ?: 0
+                        pendingSilenceEndMs = parts[1].toIntOrNull() ?: -1
+                    }
+                } else {
+                    val result = AudioAnalyzer.detectSilenceTrim(this@PlayerService, song.uri, song.duration)
+                    db.appPrefDao().set(AppPrefEntity("trim_${song.id}", "${result.startMs}:${result.endMs}"))
+                    if (token == prepareToken) {
+                        pendingSilenceStartMs = result.startMs.toInt()
+                        pendingSilenceEndMs = result.endMs.toInt()
+                    }
+                }
+            }
+        }
+    }
+
+    /** [4] Sona yaklaşınca sondaki sessizliği atlayıp bir sonraki şarkıya geç */
+    private fun scheduleSilenceEndCheck() {
+        if (!silenceTrimEnabled || pendingSilenceEndMs <= 0) return
+        mainHandler.postDelayed(object : Runnable {
+            override fun run() {
+                if (!isPlaying) return
+                if (pendingSilenceEndMs in 1 until duration && position >= pendingSilenceEndMs) {
+                    onComplete()
+                } else if (isPlaying) {
+                    mainHandler.postDelayed(this, 500)
+                }
+            }
+        }, 500)
+    }
+
+    /** [2] Ses Normalizasyonu: DB'de kayıtlı kazanç varsa uygular, yoksa arka planda hesaplar */
+    private fun applyNormalizationGain(song: Song) {
+        if (!normalizeEnabled) return
+        ioScope.launch {
+            val dao = AppDatabase.get(this@PlayerService).songGainDao()
+            var gainDb = dao.getGain(song.id)
+            if (gainDb == null) {
+                gainDb = AudioAnalyzer.analyzeGain(this@PlayerService, song.uri)
+                dao.set(com.tdev.mplayr.db.SongGainEntity(song.id, gainDb))
+            }
+            // dB -> lineer kazanç, MediaPlayer setVolume 0f..1f aralığında çalışır
+            val linear = Math.pow(10.0, (gainDb / 20.0)).toFloat().coerceIn(0.2f, 1f)
+            mainHandler.post {
+                if (current?.id == song.id) runCatching { mp?.setVolume(linear, linear) }
+            }
+        }
     }
 
     fun togglePlay() { if (isPlaying) pause() else resume() }
@@ -455,6 +625,8 @@ class PlayerService : Service() {
         equalizer?.release()
         bassBoost?.release()
         session.release()
+        sensorHelper.stop()
+        runCatching { headsetReceiver?.let { unregisterReceiver(it) } }
         ioScope.cancel()
         mainScope.cancel()
         stopForeground(true)

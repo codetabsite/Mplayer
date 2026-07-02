@@ -181,6 +181,32 @@
             android:layout_marginBottom="16dp" />
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" android:text="TÜR DAĞILIMI"
+            android:textColor="@color/accent" android:textSize="11sp"
+            android:letterSpacing="0.12" android:textAllCaps="true" />
+
+        <LinearLayout
+            android:id="@+id/genreChartContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@color/bg_card"
+            android:padding="8dp"
+            android:orientation="vertical" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" android:text="6 AYDIR DİNLENMEYENLER"
+            android:textColor="@color/accent" android:textSize="11sp"
+            android:letterSpacing="0.12" android:textAllCaps="true" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvForgotten"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginBottom="16dp" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:layout_marginBottom="8dp" android:text="SON DİNLENENLER"
             android:textColor="@color/accent" android:textSize="11sp"
             android:letterSpacing="0.12" android:textAllCaps="true" />

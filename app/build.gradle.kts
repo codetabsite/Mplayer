@@ -58,6 +58,8 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
+    // [27] Klasör seçme (ActivityResultContracts.OpenDocumentTree) için
+    implementation("androidx.activity:activity-ktx:1.8.2")
 
     // Room
     implementation("androidx.room:room-runtime:2.6.1")

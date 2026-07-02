@@ -38,6 +38,16 @@
             android:src="@drawable/ic_eq"
             android:tint="@color/text_primary"
             android:contentDescription="İstatistikler" />
+
+        <ImageButton
+            android:id="@+id/btnTools"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_repeat"
+            android:tint="@color/text_primary"
+            android:contentDescription="Araçlar" />
     </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout

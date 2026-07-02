@@ -11,7 +11,11 @@
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
+    <!-- [3][10] İvmeölçer erişimi için özellik bildirimi (çoğu cihazda zaten var, opsiyonel) -->
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />
+
     <application
+        android:name=".MPlayrApp"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -41,6 +45,32 @@
 
         <activity
             android:name=".ui.StatsActivity"
+            android:exported="false" />
+
+        <!-- [18] Çöp Kutusu -->
+        <activity
+            android:name=".ui.TrashActivity"
+            android:exported="false" />
+
+        <!-- [27] Klasör Kara Listesi -->
+        <activity
+            android:name=".ui.BlacklistActivity"
+            android:exported="false" />
+
+        <!-- [19] Kopya Şarkı Temizleyici -->
+        <activity
+            android:name=".ui.DuplicateCleanerActivity"
+            android:exported="false" />
+
+        <!-- [22] LRC Söz Editörü -->
+        <activity
+            android:name=".ui.LyricsEditorActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- [30] Ringtone Maker -->
+        <activity
+            android:name=".ui.RingtoneMakerActivity"
             android:exported="false" />
 
         <service

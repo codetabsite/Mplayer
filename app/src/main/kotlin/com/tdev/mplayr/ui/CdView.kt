@@ -34,6 +34,18 @@ class CdView @JvmOverloads constructor(
     var rotationDeg: Float = 0f
         set(v) { field = v; invalidate() }
 
+    // [8] CdView (Plak) Özelleştirme Seçenekleri
+    var shimmerEnabled: Boolean = true
+        set(v) { field = v; invalidate() }
+    var reflectionRingsEnabled: Boolean = true
+        set(v) { field = v; invalidate() }
+    var diskFallbackColor: Int = 0xFF222222.toInt()
+        set(v) { field = v; invalidate() }
+    var rimColor: Int = 0x33FFFFFF
+        set(v) { field = v; invalidate() }
+    var holeColor: Int = Color.BLACK
+        set(v) { field = v; invalidate() }
+
     fun setAlbumBitmap(bmp: Bitmap?) {
         albumBitmap = bmp
         albumShader = bmp?.let {
@@ -67,26 +79,30 @@ class CdView @JvmOverloads constructor(
             canvas.drawCircle(cx, cy, r, bitmapPaint)
             canvas.restore()
         } ?: run {
-            val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF222222.toInt() }
+            val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = diskFallbackColor }
             canvas.drawCircle(cx, cy, r, p)
         }
 
-        val shimmerColors  = intArrayOf(0x00FFFFFF, 0x55FFFFFF, 0x00FFFFFF)
-        val shimmerPositions = floatArrayOf(0f, 0.5f, 1f)
-        val sweep = SweepGradient(cx, cy, shimmerColors, shimmerPositions)
-        shimmerPaint.shader = sweep
-        canvas.drawCircle(cx, cy, r * 0.75f, shimmerPaint)
-        canvas.drawCircle(cx, cy, r * 0.55f, shimmerPaint)
-
-        reflectPaint.color = 0x22FFFFFF
-        for (i in 1..4) {
-            canvas.drawCircle(cx, cy, r * (0.55f + i * 0.11f), reflectPaint)
+        if (shimmerEnabled) {
+            val shimmerColors  = intArrayOf(0x00FFFFFF, 0x55FFFFFF, 0x00FFFFFF)
+            val shimmerPositions = floatArrayOf(0f, 0.5f, 1f)
+            val sweep = SweepGradient(cx, cy, shimmerColors, shimmerPositions)
+            shimmerPaint.shader = sweep
+            canvas.drawCircle(cx, cy, r * 0.75f, shimmerPaint)
+            canvas.drawCircle(cx, cy, r * 0.55f, shimmerPaint)
         }
 
-        canvas.drawCircle(cx, cy, r * 0.14f, holePaint)
+        if (reflectionRingsEnabled) {
+            reflectPaint.color = 0x22FFFFFF
+            for (i in 1..4) {
+                canvas.drawCircle(cx, cy, r * (0.55f + i * 0.11f), reflectPaint)
+            }
+        }
+
+        canvas.drawCircle(cx, cy, r * 0.14f, holePaint.apply { color = holeColor })
         rimPaint.color = 0x88FFFFFF.toInt()
         canvas.drawCircle(cx, cy, r * 0.14f, rimPaint)
-        rimPaint.color = 0x33FFFFFF
+        rimPaint.color = rimColor
         canvas.drawCircle(cx, cy, r, rimPaint)
 
         canvas.restore()

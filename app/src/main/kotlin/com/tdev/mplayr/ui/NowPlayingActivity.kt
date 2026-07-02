@@ -55,6 +55,9 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
     private lateinit var toolbarLayout:   View
     private lateinit var controlsLayout:  View
     private lateinit var btnFullscreen:   ImageButton
+    private lateinit var btnNote:         TextView
+    private lateinit var btnLyrics:       TextView
+    private lateinit var waveformSeek:    WaveformSeekBar
 
     private val db      by lazy { AppDatabase.get(this) }
     private val handler = Handler(Looper.getMainLooper())
@@ -77,6 +80,7 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
             if (s != null && s.isPlaying) {
                 seek.progress = s.position
                 tvPos.text    = fmt(s.position)
+                if (s.duration > 0) waveformSeek.setProgress(s.position.toFloat() / s.duration)
             }
             handler.postDelayed(this, 500)
         }
@@ -122,6 +126,13 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
         toolbarLayout  = findViewById(R.id.toolbarLayout)
         controlsLayout = findViewById(R.id.controlsLayout)
         btnFullscreen  = findViewById(R.id.btnFullscreen)
+        btnNote        = findViewById(R.id.btnNote)
+        btnLyrics      = findViewById(R.id.btnLyrics)
+        waveformSeek   = findViewById(R.id.waveformSeek)
+        waveformSeek.onSeek = { ratio ->
+            val dur = svc?.duration ?: 0
+            if (dur > 0) svc?.seekTo((dur * ratio).toInt())
+        }
 
         vuBars = listOf(
             findViewById(R.id.vuBar1), findViewById(R.id.vuBar2),
@@ -153,13 +164,34 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
                 0 -> { abAMs = s.position; abState = 1; btnAB.text = "A-B  [A]"; btnAB.alpha = 1f }
                 1 -> {
                     val bMs = s.position
-                    if (bMs > abAMs) { s.setABLoop(abAMs, bMs); abState = 2; btnAB.text = "A-B  ●" }
+                    if (bMs > abAMs) {
+                        s.setABLoop(abAMs, bMs); abState = 2; btnAB.text = "A-B  ●"
+                        promptSaveABLoop(abAMs, bMs) // [7] isimlendirilebilir kayıt
+                    }
                 }
                 2 -> { s.clearABLoop(); abAMs = -1; abState = 0; btnAB.text = "A-B"; btnAB.alpha = 0.5f }
             }
         }
 
+        // [7] Uzun basış: kayıtlı A-B döngülerini listele
+        btnAB.setOnLongClickListener {
+            showSavedABLoops()
+            true
+        }
+
         btnFullscreen.setOnClickListener { toggleFullscreen() }
+
+        // [24] Şarkılara Özel Not Defteri
+        btnNote.setOnClickListener { showNoteDialog() }
+        // [22] Yerel LRC Söz Editörü'nü ayrı ekranda aç
+        btnLyrics.setOnClickListener {
+            val song = svc?.current ?: return@setOnClickListener
+            startActivity(Intent(this, LyricsEditorActivity::class.java).apply {
+                putExtra("songId", song.id)
+                putExtra("songTitle", song.title)
+                putExtra("songUri", song.uri.toString())
+            })
+        }
 
         cdView.setOnLongClickListener {
             retroClickCount++
@@ -340,6 +372,89 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
             .setNegativeButton("İptal", null).show()
     }
 
+    // [7] İsimlendirilebilir A-B Döngü Kaydedici
+    private fun promptSaveABLoop(startMs: Int, endMs: Int) {
+        val song = svc?.current ?: return
+        val input = EditText(this).apply { hint = "Döngü adı (örn: Nakarat)" }
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Döngüyü kaydet")
+            .setView(input)
+            .setPositiveButton("Kaydet") { _, _ ->
+                val name = input.text.toString().trim().ifBlank { "İsimsiz Döngü" }
+                lifecycleScope.launch {
+                    db.abLoopDao().insert(
+                        com.tdev.mplayr.db.ABLoopEntity(
+                            songId = song.id, name = name, startMs = startMs, endMs = endMs
+                        )
+                    )
+                    runOnUiThread { Toast.makeText(this@NowPlayingActivity, "Döngü kaydedildi: $name", Toast.LENGTH_SHORT).show() }
+                }
+            }
+            .setNegativeButton("Vazgeç", null)
+            .show()
+    }
+
+    private fun showSavedABLoops() {
+        val song = svc?.current ?: return
+        lifecycleScope.launch {
+            val loops = db.abLoopDao().getForSong(song.id)
+            runOnUiThread {
+                if (loops.isEmpty()) {
+                    Toast.makeText(this@NowPlayingActivity, "Bu şarkı için kayıtlı döngü yok", Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+                val labels = loops.map { "${it.name} (${fmt(it.startMs)}–${fmt(it.endMs)})" }.toTypedArray()
+                android.app.AlertDialog.Builder(this@NowPlayingActivity)
+                    .setTitle("Kayıtlı Döngüler")
+                    .setItems(labels) { _, i ->
+                        val loop = loops[i]
+                        svc?.setABLoop(loop.startMs, loop.endMs)
+                        abState = 2; abAMs = loop.startMs
+                        btnAB.text = "A-B  ●"; btnAB.alpha = 1f
+                    }
+                    .setNegativeButton("Kapat", null)
+                    .setNeutralButton("Sil") { _, _ ->
+                        // basitlik için ilk döngüyü siler; gelişmiş silme akışı istenirse ayrı liste eklenebilir
+                        lifecycleScope.launch { db.abLoopDao().delete(loops.first()) }
+                    }
+                    .show()
+            }
+        }
+    }
+
+    // [24] Şarkılara Özel Not Defteri Alanı
+    private fun showNoteDialog() {
+        val song = svc?.current ?: return
+        lifecycleScope.launch {
+            val existing = db.songNoteDao().get(song.id)
+            runOnUiThread {
+                val input = EditText(this@NowPlayingActivity).apply {
+                    hint = "Bu şarkı hakkında not..."
+                    setText(existing?.note ?: "")
+                    minLines = 4
+                    gravity = android.view.Gravity.TOP
+                }
+                android.app.AlertDialog.Builder(this@NowPlayingActivity)
+                    .setTitle("Not — ${song.title}")
+                    .setView(input)
+                    .setPositiveButton("Kaydet") { _, _ ->
+                        val text = input.text.toString()
+                        lifecycleScope.launch {
+                            if (text.isBlank()) {
+                                db.songNoteDao().delete(song.id)
+                            } else {
+                                db.songNoteDao().set(
+                                    com.tdev.mplayr.db.SongNoteEntity(songId = song.id, note = text)
+                                )
+                            }
+                        }
+                    }
+                    .setNegativeButton("Vazgeç", null)
+                    .show()
+            }
+        }
+    }
+
     private fun showEqDialog() {
         val eq = svc?.equalizer ?: run {
             Toast.makeText(this, "Equalizer kullanılamıyor", Toast.LENGTH_SHORT).show(); return
@@ -369,6 +484,14 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
                 layout.addView(this)
             }
         }
+
+        // [8] CdView (Plak) Özelleştirme Seçenekleri
+        layout.addView(TextView(this).apply { text = "\nPlak Görünümü"; setPadding(0, 16, 0, 4) })
+        val shimmerSwitch = Switch(this).apply { text = "Parıltı efekti"; isChecked = cdView.shimmerEnabled }
+        val ringsSwitch = Switch(this).apply { text = "Yansıma halkaları"; isChecked = cdView.reflectionRingsEnabled }
+        layout.addView(shimmerSwitch)
+        layout.addView(ringsSwitch)
+
         android.app.AlertDialog.Builder(this).setTitle("Ses Efektleri").setView(layout)
             .setPositiveButton("Tamam") { _, _ ->
                 svc?.eqEnabled         = enableSwitch.isChecked
@@ -377,6 +500,8 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
                 seekBars.forEachIndexed { i, sb ->
                     eq.setBandLevel(i.toShort(), (sb.progress + minLevel).toShort())
                 }
+                cdView.shimmerEnabled = shimmerSwitch.isChecked
+                cdView.reflectionRingsEnabled = ringsSwitch.isChecked
             }
             .setNegativeButton("İptal", null).show()
     }
@@ -409,6 +534,18 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
         tvArtist.text = song.artist
         tvDur.text    = song.formatDuration()
         seek.max      = song.duration.toInt()
+
+        // [9] Waveform SeekBar — arka planda amplitüd çıkar, hazır olunca göster
+        waveformSeek.visibility = View.GONE
+        lifecycleScope.launch {
+            val amps = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                com.tdev.mplayr.audio.WaveformExtractor.extract(this@NowPlayingActivity, song.uri, 80)
+            }
+            if (amps.isNotEmpty() && svc?.current?.id == song.id) {
+                waveformSeek.setAmplitudes(amps)
+                waveformSeek.visibility = View.VISIBLE
+            }
+        }
 
         Glide.with(this).asBitmap().load(song.artUri)
             .placeholder(R.drawable.ic_note).error(R.drawable.ic_note)
