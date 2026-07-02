@@ -10,7 +10,9 @@ data class Song(
     val album: String,
     val albumId: Long,
     val duration: Long,
-    val uri: Uri          // content:// Uri — DATA kolonu yerine
+    val uri: Uri,          // content:// Uri — DATA kolonu yerine
+    val filePath: String = "", // [27][19] klasör kara listesi ve kopya tespiti için dosya yolu
+    val genre: String = "Bilinmiyor" // [16] Tür dağılımı pasta grafiği için
 ) {
     val artUri: Uri get() = ContentUris.withAppendedId(
         Uri.parse("content://media/external/audio/albumart"), albumId

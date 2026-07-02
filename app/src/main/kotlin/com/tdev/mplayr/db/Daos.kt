@@ -205,6 +205,24 @@ interface PlayHistoryDao {
 
     @Query("DELETE FROM play_history WHERE playedAt < :before")
     suspend fun purgeOlderThan(before: Long)
+
+    // [15] Erkenci kuş gizli başarımı: 05:00-06:59 arası dinleme sayısı
+    @Query("""
+        SELECT COUNT(*) FROM play_history
+        WHERE strftime('%H', datetime(playedAt/1000, 'unixepoch', 'localtime'))
+              BETWEEN '05' AND '06'
+    """)
+    suspend fun getEarlyBirdPlayCount(): Int
+
+    // [20] 6 Aydır Dinlenmeyenler: en son çalınma tarihi belirtilen eşikten eski olan şarkılar
+    @Query("""
+        SELECT songId, title, artist, COUNT(*) AS playCount
+        FROM play_history
+        GROUP BY songId
+        HAVING MAX(playedAt) < :sixMonthsAgo
+        ORDER BY MAX(playedAt) ASC
+    """)
+    suspend fun getForgottenSongs(sixMonthsAgo: Long): List<SongPlayCount>
 }
 
 @Dao
@@ -238,4 +256,112 @@ interface AppPrefDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun set(pref: AppPrefEntity)
+}
+
+// [24] Şarkı not defteri
+@Dao
+interface SongNoteDao {
+    @Query("SELECT * FROM song_notes WHERE songId = :songId")
+    suspend fun get(songId: Long): SongNoteEntity?
+
+    @Query("SELECT * FROM song_notes WHERE songId = :songId")
+    fun getFlow(songId: Long): Flow<SongNoteEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun set(note: SongNoteEntity)
+
+    @Query("DELETE FROM song_notes WHERE songId = :songId")
+    suspend fun delete(songId: Long)
+}
+
+// [22] LRC söz editörü/senkronu
+@Dao
+interface LyricsDao {
+    @Query("SELECT * FROM lyrics_lines WHERE songId = :songId ORDER BY timeMs ASC")
+    suspend fun getLines(songId: Long): List<LyricsLineEntity>
+
+    @Query("SELECT * FROM lyrics_lines WHERE songId = :songId ORDER BY timeMs ASC")
+    fun getLinesFlow(songId: Long): Flow<List<LyricsLineEntity>>
+
+    @Insert
+    suspend fun insertLine(line: LyricsLineEntity): Long
+
+    @Insert
+    suspend fun insertLines(lines: List<LyricsLineEntity>)
+
+    @Query("DELETE FROM lyrics_lines WHERE songId = :songId")
+    suspend fun clearForSong(songId: Long)
+
+    @Query("SELECT EXISTS(SELECT 1 FROM lyrics_lines WHERE songId = :songId)")
+    suspend fun hasLyrics(songId: Long): Boolean
+}
+
+// [18] Çöp kutusu
+@Dao
+interface DeletedSongDao {
+    @Query("SELECT * FROM deleted_songs ORDER BY deletedAt DESC")
+    fun getAllFlow(): Flow<List<DeletedSongEntity>>
+
+    @Query("SELECT * FROM deleted_songs ORDER BY deletedAt DESC")
+    suspend fun getAll(): List<DeletedSongEntity>
+
+    @Query("SELECT songId FROM deleted_songs")
+    suspend fun getAllIds(): List<Long>
+
+    @Query("SELECT songId FROM deleted_songs")
+    fun getAllIdsFlow(): Flow<List<Long>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun add(entry: DeletedSongEntity)
+
+    @Query("DELETE FROM deleted_songs WHERE songId = :songId")
+    suspend fun restore(songId: Long)
+
+    @Query("DELETE FROM deleted_songs WHERE deletedAt < :before")
+    suspend fun purgeOlderThan(before: Long)
+
+    @Query("DELETE FROM deleted_songs")
+    suspend fun clearAll()
+}
+
+// [27] Klasör kara listesi
+@Dao
+interface BlacklistDao {
+    @Query("SELECT path FROM blacklisted_folders")
+    suspend fun getAll(): List<String>
+
+    @Query("SELECT path FROM blacklisted_folders")
+    fun getAllFlow(): Flow<List<String>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun add(entry: BlacklistedFolderEntity)
+
+    @Query("DELETE FROM blacklisted_folders WHERE path = :path")
+    suspend fun remove(path: String)
+}
+
+// [7] İsimlendirilebilir A-B döngüleri
+@Dao
+interface ABLoopDao {
+    @Query("SELECT * FROM ab_loops WHERE songId = :songId ORDER BY createdAt DESC")
+    suspend fun getForSong(songId: Long): List<ABLoopEntity>
+
+    @Query("SELECT * FROM ab_loops WHERE songId = :songId ORDER BY createdAt DESC")
+    fun getForSongFlow(songId: Long): Flow<List<ABLoopEntity>>
+
+    @Insert
+    suspend fun insert(loop: ABLoopEntity): Long
+
+    @Delete
+    suspend fun delete(loop: ABLoopEntity)
+}
+
+// [2] Ses normalizasyonu kazançları
+@Dao
+interface SongGainDao {
+    @Query("SELECT gainDb FROM song_gain WHERE songId = :songId")
+    suspend fun getGain(songId: Long): Float?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun set(entry: SongGainEntity)
 }

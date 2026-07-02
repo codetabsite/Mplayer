@@ -107,6 +107,9 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
             startActivity(Intent(this, StatsActivity::class.java))
         }
 
+        // Araçlar menüsü: Çöp Kutusu[18], Kara Liste[27], Kopya Temizleyici[19], Mono/Normalize/Sallama ayarları
+        findViewById<ImageButton>(R.id.btnTools)?.setOnClickListener { showToolsMenu() }
+
         findViewById<android.view.View>(R.id.nowPlayingBar).setOnClickListener {
             startActivity(Intent(this, NowPlayingActivity::class.java))
         }
@@ -212,9 +215,56 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
         }
     }
 
+    private fun showToolsMenu() {
+        val opts = arrayOf(
+            "🗑️ Çöp Kutusu",
+            "🚫 Klasör Kara Listesi",
+            "🧹 Kopya Şarkı Temizleyici",
+            "📳 Telefonu Sallayarak Değiştir: ${if (svc?.shakeToSkipEnabled == true) "Açık" else "Kapalı"}",
+            "🌙 Hareketsizlikte Uyku Modu",
+            "🔊 Ses Normalizasyonu: ${if (svc?.normalizeEnabled == true) "Açık" else "Kapalı"}",
+            "🎧 Mono Mod: ${if (svc?.monoEnabled == true) "Açık" else "Kapalı"}",
+            "✂️ Sessizlik Kırpma: ${if (svc?.silenceTrimEnabled == true) "Açık" else "Kapalı"}"
+        )
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Araçlar")
+            .setItems(opts) { _, i ->
+                when (i) {
+                    0 -> startActivity(Intent(this, TrashActivity::class.java))
+                    1 -> startActivity(Intent(this, BlacklistActivity::class.java))
+                    2 -> startActivity(Intent(this, DuplicateCleanerActivity::class.java))
+                    3 -> { svc?.shakeToSkipEnabled = !(svc?.shakeToSkipEnabled ?: false)
+                           Toast.makeText(this, "Sallama ayarı güncellendi", Toast.LENGTH_SHORT).show() }
+                    4 -> showSleepMotionDialog()
+                    5 -> { svc?.normalizeEnabled = !(svc?.normalizeEnabled ?: false)
+                           Toast.makeText(this, "Normalizasyon ayarı güncellendi", Toast.LENGTH_SHORT).show() }
+                    6 -> { svc?.monoEnabled = !(svc?.monoEnabled ?: false)
+                           Toast.makeText(this, "Mono mod güncellendi", Toast.LENGTH_SHORT).show() }
+                    7 -> { svc?.silenceTrimEnabled = !(svc?.silenceTrimEnabled ?: false)
+                           Toast.makeText(this, "Sessizlik kırpma güncellendi", Toast.LENGTH_SHORT).show() }
+                }
+            }
+            .setNegativeButton("Kapat", null)
+            .show()
+    }
+
+    /** [3] İvmeölçer ile Akıllı Uyku Modu ayar diyaloğu */
+    private fun showSleepMotionDialog() {
+        val opts = arrayOf("Kapat", "10 dakika hareketsizlik", "15 dakika", "30 dakika")
+        val mins = intArrayOf(0, 10, 15, 30)
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Hareketsizlikte Uyku Modu")
+            .setItems(opts) { _, i ->
+                if (mins[i] == 0) svc?.stopMotionSleepMode()
+                else svc?.startMotionSleepMode(mins[i])
+                Toast.makeText(this, opts[i], Toast.LENGTH_SHORT).show()
+            }
+            .show()
+    }
+
     private fun showSongContextMenu(pos: Int) {
         val song = adapter.get(pos)
-        val opts = arrayOf("Sıraya ekle", "Sonraki çal", "Şarkı bilgisi")
+        val opts = arrayOf("Sıraya ekle", "Sonraki çal", "Şarkı bilgisi", "Zil sesi yap", "Çöp kutusuna taşı")
         android.app.AlertDialog.Builder(this)
             .setTitle(song.title)
             .setItems(opts) { _, i ->
@@ -222,6 +272,21 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
                     0 -> { svc?.addToQueue(song); Toast.makeText(this, "Sıraya eklendi", Toast.LENGTH_SHORT).show() }
                     1 -> { svc?.playNext(song);   Toast.makeText(this, "Sonraki çalınacak", Toast.LENGTH_SHORT).show() }
                     2 -> showSongInfo(song)
+                    3 -> startActivity(Intent(this, RingtoneMakerActivity::class.java).apply {
+                            putExtra("songUri", song.uri.toString())
+                            putExtra("songTitle", song.title)
+                            putExtra("durationMs", song.duration.toInt())
+                        })
+                    4 -> lifecycleScope.launch {
+                            db.deletedSongDao().add(
+                                com.tdev.mplayr.db.DeletedSongEntity(song.id, song.title, song.artist)
+                            )
+                            runOnUiThread {
+                                allSongs = allSongs.filterNot { it.id == song.id }
+                                adapter.setSongs(adapter.getShown().filterNot { it.id == song.id })
+                                Toast.makeText(this@MainActivity, "Çöp kutusuna taşındı", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                 }
             }.show()
     }
@@ -278,7 +343,12 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
 
     private fun loadAndBind() {
         thread {
-            val songs = MusicLoader.loadAll(this)
+            var songs = MusicLoader.loadAll(this)
+            // [27] Kara listedeki klasörleri filtrele, [18] silinenleri gizle
+            val blacklist = runBlocking_ { db.blacklistDao().getAll() }
+            val deletedIds = runBlocking_ { db.deletedSongDao().let { it.getAll().map { d -> d.songId } } }
+            songs = MusicLoader.filterBlacklisted(songs, blacklist)
+            songs = MusicLoader.filterDeleted(songs, deletedIds)
             allSongs = songs
             runOnUiThread { adapter.setSongs(songs) }
         }
@@ -286,6 +356,10 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
         startService(i)
         bindService(i, conn, BIND_AUTO_CREATE)
     }
+
+    /** thread{} bloğu içinden suspend DAO fonksiyonlarını çağırmak için basit köprü */
+    private fun <T> runBlocking_(block: suspend () -> T): T =
+        kotlinx.coroutines.runBlocking { block() }
 
     private fun onSongClick(pos: Int) {
         val svc = svc ?: return

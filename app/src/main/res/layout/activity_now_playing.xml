@@ -171,6 +171,13 @@
                 android:gravity="end" />
         </LinearLayout>
 
+        <com.tdev.mplayr.ui.WaveformSeekBar
+            android:id="@+id/waveformSeek"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+
         <LinearLayout
             android:id="@+id/controlsLayout"
             android:layout_width="match_parent"
@@ -257,6 +264,38 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="CF"
+                    android:textColor="@color/text_primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:alpha="0.5"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp"
+                    android:background="@color/surface"
+                    android:layout_marginHorizontal="8dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/btnNote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Not"
+                    android:textColor="@color/text_primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:alpha="0.5"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp"
+                    android:background="@color/surface"
+                    android:layout_marginHorizontal="8dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/btnLyrics"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Söz"
                     android:textColor="@color/text_primary"
                     android:textSize="12sp"
                     android:textStyle="bold"
