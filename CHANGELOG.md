@@ -1,9 +1,11 @@
 # Changelog
 
-## [4.0] - 2026-07-07
+## [4.0-fdroid] - 2026-07-07
 ### Added
 - Multi-language support (Turkish, English, German, Chinese, Japanese, Spanish)
 - F-Droid metadata and screenshots
+## .[4.0] - 2026-06-24
+### Added
 - Achievement system
 - Sleep timer
 - Lyrics editor with LRC format
