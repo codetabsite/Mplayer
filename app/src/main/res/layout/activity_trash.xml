@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="Çöp Kutusu"
+                android:text="@string/title_trash"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:text="Boşalt"
+                android:text="@string/btn_empty_trash"
                 android:textSize="12sp" />
         </RelativeLayout>
 

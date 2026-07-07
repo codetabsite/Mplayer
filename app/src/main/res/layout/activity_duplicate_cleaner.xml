@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="Kopya Temizleyici"
+                android:text="@string/title_duplicate_cleaner"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -47,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="Seçilenleri Çöp Kutusuna Taşı" />
+            android:text="@string/btn_move_to_trash" />
 
         <LinearLayout
             android:id="@+id/duplicateContainer"

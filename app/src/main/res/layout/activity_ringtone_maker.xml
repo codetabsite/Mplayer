@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Zil Sesi Yap"
+            android:text="@string/title_ringtone_maker"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -41,7 +41,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Başlangıç"
+        android:text="@string/label_start"
         android:textColor="@color/text_dim"
         android:textSize="12sp" />
     <SeekBar
@@ -53,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="Bitiş"
+        android:text="@string/label_end"
         android:textColor="@color/text_dim"
         android:textSize="12sp" />
     <SeekBar
@@ -76,6 +76,6 @@
         android:id="@+id/btnSaveRingtone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Zil Sesi Olarak Kaydet" />
+        android:text="@string/btn_save_ringtone" />
 
 </LinearLayout>

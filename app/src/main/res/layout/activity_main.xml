@@ -63,17 +63,17 @@
         app:tabMode="scrollable"
         app:tabTextAppearance="@style/TabText">
         <com.google.android.material.tabs.TabItem android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="Tümü" />
+            android:layout_height="wrap_content" android:text="@string/tab_all" />
         <com.google.android.material.tabs.TabItem android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="Sanatçı" />
+            android:layout_height="wrap_content" android:text="@string/tab_artist" />
         <com.google.android.material.tabs.TabItem android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="Albüm" />
+            android:layout_height="wrap_content" android:text="@string/tab_album" />
         <com.google.android.material.tabs.TabItem android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="❤ Favoriler" />
+            android:layout_height="wrap_content" android:text="@string/tab_favorites" />
         <com.google.android.material.tabs.TabItem android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="Son Dinlenen" />
+            android:layout_height="wrap_content" android:text="@string/tab_recent" />
         <com.google.android.material.tabs.TabItem android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="✦ Akıllı" />
+            android:layout_height="wrap_content" android:text="@string/tab_smart" />
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.recyclerview.widget.RecyclerView

@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="İstatistikler"
+                android:text="@string/title_stats"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -43,11 +43,11 @@
             android:padding="16dp">
 
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="BU HAFTA" android:textColor="@color/accent" android:textSize="11sp"
+                android:text="@string/stats_this_week" android:textColor="@color/accent" android:textSize="11sp"
                 android:letterSpacing="0.12" android:textAllCaps="true" />
 
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" android:text="Toplam dinleme"
+                android:layout_marginTop="8dp" android:text="@string/stats_total_listen"
                 android:textColor="@color/text_secondary" android:textSize="12sp" />
 
             <TextView android:id="@+id/tvWeeklyTime" android:layout_width="wrap_content"
@@ -63,7 +63,7 @@
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="En çok sanatçı" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                        android:text="@string/stats_top_artist" android:textColor="@color/text_secondary" android:textSize="12sp" />
                     <TextView android:id="@+id/tvTopArtist" android:layout_width="wrap_content"
                         android:layout_height="wrap_content" android:text="—"
                         android:textColor="@color/text_primary" android:textSize="16sp" android:textStyle="bold" />
@@ -72,7 +72,7 @@
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="En çok şarkı" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                        android:text="@string/stats_top_song" android:textColor="@color/text_secondary" android:textSize="12sp" />
                     <TextView android:id="@+id/tvTopSong" android:layout_width="wrap_content"
                         android:layout_height="wrap_content" android:text="—"
                         android:textColor="@color/text_primary" android:textSize="14sp" android:textStyle="bold" />
@@ -89,7 +89,7 @@
             android:padding="16dp">
 
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="GENEL" android:textColor="@color/accent" android:textSize="11sp"
+                android:text="@string/stats_overall" android:textColor="@color/accent" android:textSize="11sp"
                 android:letterSpacing="0.12" android:textAllCaps="true" />
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="Toplam süre" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                        android:text="@string/stats_total_duration" android:textColor="@color/text_secondary" android:textSize="12sp" />
                     <TextView android:id="@+id/tvTotalTime" android:layout_width="wrap_content"
                         android:layout_height="wrap_content" android:text="—"
                         android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold" />
@@ -107,7 +107,7 @@
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="Bu ay dinlenen" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                        android:text="@string/stats_this_month" android:textColor="@color/text_secondary" android:textSize="12sp" />
                     <TextView android:id="@+id/tvMonthSongs" android:layout_width="wrap_content"
                         android:layout_height="wrap_content" android:text="—"
                         android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold" />
@@ -123,7 +123,7 @@
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="En aktif saat" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                        android:text="@string/stats_peak_hour" android:textColor="@color/text_secondary" android:textSize="12sp" />
                     <TextView android:id="@+id/tvActiveHour" android:layout_width="wrap_content"
                         android:layout_height="wrap_content" android:text="—"
                         android:textColor="@color/text_primary" android:textSize="16sp" android:textStyle="bold" />
@@ -132,7 +132,7 @@
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="En uzun dinleme" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                        android:text="@string/stats_longest_session" android:textColor="@color/text_secondary" android:textSize="12sp" />
                     <TextView android:id="@+id/tvLongestListen" android:layout_width="wrap_content"
                         android:layout_height="wrap_content" android:text="—"
                         android:textColor="@color/text_primary" android:textSize="16sp" android:textStyle="bold" />
@@ -141,7 +141,7 @@
         </LinearLayout>
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp" android:text="GÜNLÜK GRAFİK"
+            android:layout_marginBottom="8dp" android:text="@string/stats_daily_chart"
             android:textColor="@color/accent" android:textSize="11sp"
             android:letterSpacing="0.12" android:textAllCaps="true" />
 
@@ -155,7 +155,7 @@
             android:orientation="vertical" />
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp" android:text="BAŞARIMLAR"
+            android:layout_marginBottom="8dp" android:text="@string/stats_achievements"
             android:textColor="@color/accent" android:textSize="11sp"
             android:letterSpacing="0.12" android:textAllCaps="true" />
 
@@ -169,7 +169,7 @@
             android:orientation="vertical" />
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp" android:text="EN ÇOK DİNLENENLER"
+            android:layout_marginBottom="8dp" android:text="@string/stats_most_played"
             android:textColor="@color/accent" android:textSize="11sp"
             android:letterSpacing="0.12" android:textAllCaps="true" />
 
@@ -181,7 +181,7 @@
             android:layout_marginBottom="16dp" />
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp" android:text="TÜR DAĞILIMI"
+            android:layout_marginBottom="8dp" android:text="@string/stats_genre_dist"
             android:textColor="@color/accent" android:textSize="11sp"
             android:letterSpacing="0.12" android:textAllCaps="true" />
 
@@ -195,7 +195,7 @@
             android:orientation="vertical" />
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp" android:text="6 AYDIR DİNLENMEYENLER"
+            android:layout_marginBottom="8dp" android:text="@string/stats_not_played"
             android:textColor="@color/accent" android:textSize="11sp"
             android:letterSpacing="0.12" android:textAllCaps="true" />
 
@@ -207,7 +207,7 @@
             android:layout_marginBottom="16dp" />
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp" android:text="SON DİNLENENLER"
+            android:layout_marginBottom="8dp" android:text="@string/stats_recent"
             android:textColor="@color/accent" android:textSize="11sp"
             android:letterSpacing="0.12" android:textAllCaps="true" />
 
