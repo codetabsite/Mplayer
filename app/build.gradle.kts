@@ -16,24 +16,11 @@ android {
         versionName = "4.0"
     }
 
-    signingConfigs {
-        create("release") {
-            val keystoreB64 = System.getenv("KEYSTORE_BASE64")
-            if (keystoreB64 != null) {
-                storeFile = file("${rootDir}/keystore.jks")
-                storePassword = System.getenv("KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("KEY_ALIAS")
-                keyPassword = System.getenv("KEY_PASSWORD")
-            }
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("release")
         }
         debug {
             applicationIdSuffix = ".debug"
@@ -58,7 +45,6 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
-    // [27] Klasör seçme (ActivityResultContracts.OpenDocumentTree) için
     implementation("androidx.activity:activity-ktx:1.8.2")
 
     // Room
@@ -75,4 +61,3 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
 }
-// palette eklendi

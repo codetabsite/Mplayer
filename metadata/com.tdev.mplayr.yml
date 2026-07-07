@@ -1,0 +1,25 @@
+Categories:
+  - Multimedia
+
+License: Apache-2.0
+SourceCode: https://github.com/codetabsite/Mplayer
+IssueTracker: https://github.com/codetabsite/Mplayer/issues
+
+AutoName: MPlayer
+
+RepoType: git
+Repo: https://github.com/codetabsite/Mplayer
+
+Builds:
+  - versionName: '4.0'
+    versionCode: 4
+    commit: main
+    subdir: app
+    gradle:
+      - yes
+    prebuild: true
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: '4.0'
+CurrentVersionCode: 4
