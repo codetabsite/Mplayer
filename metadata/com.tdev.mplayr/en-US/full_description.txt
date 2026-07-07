@@ -1,16 +1,37 @@
-MPlayer is a minimal, open-source MP3 player for Android with no ads and no bloat.
+♪ MPlayer is a free, open-source, and ad-free MP3 player for Android. It's designed with simplicity and performance in mind — no bloated features, tracking mechanisms, or unnecessary clutter.
+🎵 PLAY
+Waveform advancement bar for precise navigation.
+A-B loop — repeating a specific section of a song.
+Smooth transition between segments (crossfade)
+Adjustable playback speed
+Mono mode
+Voice normalization
+Silent clipping
+Shake to skip.
+🎨 INTERFACE
+Dynamic theme, responsive to album cover colors.
+Spinning CD/record animation
+Dark mode support
+Clean and minimalist design
+📋 LIBRARY
+Browse all, by artist, album, favorites, recently played, and smart playlists.
+Search songs instantly
+Duplicate song cleaner
+Folder blacklist — excluding specific folders from the library
+❤️ FEATURES
+Favorites list
+Sleep timer
+Lyrics editor with LRC format support.
+Ringtone maker — trim any song and save it as a ringtone.
+Trash/recycling bin for deleted songs.
+Headphone and Bluetooth controls
+Fully controlled MediaSession notification
+📊 STATISTICS AND ACHIEVEMENTS
+Weekly and overall listening statistics.
+Daily chart/list
+Style (type) distribution
+Most played songs
+Performance system
+No ads. No internet access. No data collection. Just music.
 
-Features:
-- Clean, minimal interface
-- Waveform seek bar
-- Favorites support
-- Sleep timer
-- Lyrics editor (LRC format)
-- Duplicate song cleaner
-- Folder blacklist
-- Trash / recycle bin for deleted songs
-- Ringtone maker
-- Stats and play history
-- Album art with palette-based theming
-- Headset controls
-- MediaSession / notification controls
+♪•Made With ❤️•♪
