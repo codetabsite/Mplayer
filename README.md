@@ -2,7 +2,7 @@
 
 
 
-![Build](https://github.com/codetabsite/Mplayer/actions/workflows/android.yml/badge.svg)
+![Build](https://github.com/codetabsite/Mplayer/actions/workflows/build.yml/badge.svg)
 
 
 
@@ -136,17 +136,14 @@
 |---|---|---|
 | 
 
-![](metadata/com.tdev.mplayr/en-US/images/phoneScreenshots/1.png)
+![](metadata/com.tdev.mplayr/en-US/images/phoneScreenshots/IMG-20260702-WA0120.jpg)
 
  | 
 
-![](metadata/com.tdev.mplayr/en-US/images/phoneScreenshots/2.png)
+![](metadata/com.tdev.mplayr/en-US/images/phoneScreenshots/IMG-20260702-WA0118.jpg)
 
  | 
 
-![](metadata/com.tdev.mplayr/en-US/images/phoneScreenshots/3.png)
-
- |
 
 ---
 
