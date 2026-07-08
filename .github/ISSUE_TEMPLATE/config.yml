@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security Vulnerability
+    url: https://github.com/codetabsite/Mplayer/security/advisories/new
+    about: Please report security vulnerabilities here.
+  - name: General Discussion
+    url: https://github.com/codetabsite/Mplayer/discussions
+    about: For general questions and discussions.
+  - name: Wiki
+    url: https://github.com/codetabsite/Mplayer/wiki
+    about: Check the wiki before opening an issue.
