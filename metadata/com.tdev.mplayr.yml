@@ -13,7 +13,7 @@ Repo: https://github.com/codetabsite/Mplayer
 Builds:
   - versionName: '4.0'
     versionCode: 4
-    commit: main
+    commit: f9a8a6e9953ae0a004be03a718633f33cf2d58b5
     subdir: app
     gradle:
       - yes
