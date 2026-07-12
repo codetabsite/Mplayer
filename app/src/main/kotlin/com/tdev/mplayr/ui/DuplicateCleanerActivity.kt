@@ -61,7 +61,7 @@ class DuplicateCleanerActivity : AppCompatActivity() {
         container.removeAllViews()
         if (groups.isEmpty()) {
             container.addView(TextView(this).apply {
-                text = "Kopya şarkı bulunamadı 🎉"
+                text = getString(R.string.duplicate_not_found)
                 setTextColor(0xFF888888.toInt())
                 textSize = 14f
                 setPadding(0, 24, 0, 24)
@@ -70,7 +70,7 @@ class DuplicateCleanerActivity : AppCompatActivity() {
         }
         groups.forEachIndexed { gi, group ->
             container.addView(TextView(this).apply {
-                text = "Grup ${gi + 1}: ${group.first().title} — ${group.first().artist}"
+                text = getString(R.string.duplicate_group, gi + 1, group.first().title, group.first().artist)
                 setTextColor(0xFFFFFFFF.toInt())
                 textSize = 14f
                 setPadding(0, 16, 0, 4)

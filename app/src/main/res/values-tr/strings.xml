@@ -69,3 +69,19 @@
     <string name="toast_songs_count">%d şarkı</string>
     <string name="dialog_sound_effects">Ses Efektleri</string>
 </resources>
+
+    <!-- Extra strings -->
+    <string name="lyrics_position_dynamic">Oynatma konumu: %s</string>
+    <string name="toast_write_lyrics_first2">Önce satır metni yaz</string>
+    <string name="lyrics_empty">Henüz söz eklenmedi. Şarkıyı çal, satırı yaz, doğru anda \'Şimdi Ekle\'ye bas.</string>
+    <string name="blacklist_empty">Kara listede klasör yok</string>
+    <string name="btn_remove">Kaldır</string>
+    <string name="duplicate_not_found">Kopya şarkı bulunamadı 🎉</string>
+    <string name="duplicate_group">Grup %d: %s — %s</string>
+    <string name="trash_empty">Çöp kutusu boş</string>
+    <string name="btn_restore">Geri Yükle</string>
+    <string name="eq_enabled">Equalizer Aktif</string>
+    <string name="bass_boost">Bass Boost</string>
+    <string name="bass_power">Bas Güç</string>
+    <string name="shimmer_effect">Parıltı efekti</string>
+    <string name="reflection_rings">Yansıma halkaları</string>

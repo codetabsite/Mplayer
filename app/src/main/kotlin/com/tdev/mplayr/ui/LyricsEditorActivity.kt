@@ -71,7 +71,7 @@ class LyricsEditorActivity : AppCompatActivity() {
         handler.post(object : Runnable {
             override fun run() {
                 val pos = svc?.position ?: 0
-                tvCurrentPos.text = "Oynatma konumu: ${formatMs(pos)}"
+                tvCurrentPos.text = getString(R.string.lyrics_position_dynamic, formatMs(pos))
                 handler.postDelayed(this, 500)
             }
         })
@@ -81,7 +81,7 @@ class LyricsEditorActivity : AppCompatActivity() {
         if (songId < 0) return
         val text = newLineInput.text.toString().trim()
         if (text.isBlank()) {
-            Toast.makeText(this, "Önce satır metni yaz", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_write_lyrics_first), Toast.LENGTH_SHORT).show()
             return
         }
         val posMs = svc?.position?.toLong() ?: 0L
@@ -121,7 +121,7 @@ class LyricsEditorActivity : AppCompatActivity() {
         container.removeAllViews()
         if (lines.isEmpty()) {
             container.addView(TextView(this).apply {
-                text = "Henüz söz eklenmedi. Şarkıyı çal, satırı yaz, doğru anda 'Şimdi Ekle'ye bas."
+                text = getString(R.string.lyrics_empty)
                 setTextColor(0xFF888888.toInt())
                 textSize = 13f
                 setPadding(0, 16, 0, 16)

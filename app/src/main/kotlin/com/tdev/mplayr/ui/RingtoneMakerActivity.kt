@@ -87,15 +87,15 @@ class RingtoneMakerActivity : AppCompatActivity() {
     private fun saveRingtone() {
         val outputName = songTitle.take(40).replace(Regex("[^a-zA-Z0-9_ ]"), "_")
         lifecycleScope.launch {
-            Toast.makeText(this@RingtoneMakerActivity, "Kesiliyor...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@RingtoneMakerActivity, getString(R.string.toast_cutting), Toast.LENGTH_SHORT).show()
             val resultUri = withContext(Dispatchers.IO) {
                 RingtoneMaker.trimAndSave(this@RingtoneMakerActivity, songUri, startMs.toLong(), endMs.toLong(), outputName)
             }
             if (resultUri != null) {
-                Toast.makeText(this@RingtoneMakerActivity, "Zil sesi kaydedildi ✓", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@RingtoneMakerActivity, getString(R.string.toast_ringtone_saved), Toast.LENGTH_LONG).show()
                 finish()
             } else {
-                Toast.makeText(this@RingtoneMakerActivity, "Kesme başarısız oldu", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@RingtoneMakerActivity, getString(R.string.toast_cut_failed), Toast.LENGTH_LONG).show()
             }
         }
     }

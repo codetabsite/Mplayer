@@ -234,14 +234,14 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
                     1 -> startActivity(Intent(this, BlacklistActivity::class.java))
                     2 -> startActivity(Intent(this, DuplicateCleanerActivity::class.java))
                     3 -> { svc?.shakeToSkipEnabled = !(svc?.shakeToSkipEnabled ?: false)
-                           Toast.makeText(this, "Sallama ayarı güncellendi", Toast.LENGTH_SHORT).show() }
+                           Toast.makeText(this, getString(R.string.toast_shake_updated), Toast.LENGTH_SHORT).show() }
                     4 -> showSleepMotionDialog()
                     5 -> { svc?.normalizeEnabled = !(svc?.normalizeEnabled ?: false)
-                           Toast.makeText(this, "Normalizasyon ayarı güncellendi", Toast.LENGTH_SHORT).show() }
+                           Toast.makeText(this, getString(R.string.toast_normalize_updated), Toast.LENGTH_SHORT).show() }
                     6 -> { svc?.monoEnabled = !(svc?.monoEnabled ?: false)
-                           Toast.makeText(this, "Mono mod güncellendi", Toast.LENGTH_SHORT).show() }
+                           Toast.makeText(this, getString(R.string.toast_mono_updated), Toast.LENGTH_SHORT).show() }
                     7 -> { svc?.silenceTrimEnabled = !(svc?.silenceTrimEnabled ?: false)
-                           Toast.makeText(this, "Sessizlik kırpma güncellendi", Toast.LENGTH_SHORT).show() }
+                           Toast.makeText(this, getString(R.string.toast_silence_updated), Toast.LENGTH_SHORT).show() }
                 }
             }
             .setNegativeButton("Kapat", null)
@@ -269,8 +269,8 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
             .setTitle(song.title)
             .setItems(opts) { _, i ->
                 when (i) {
-                    0 -> { svc?.addToQueue(song); Toast.makeText(this, "Sıraya eklendi", Toast.LENGTH_SHORT).show() }
-                    1 -> { svc?.playNext(song);   Toast.makeText(this, "Sonraki çalınacak", Toast.LENGTH_SHORT).show() }
+                    0 -> { svc?.addToQueue(song); Toast.makeText(this, getString(R.string.toast_added_to_queue), Toast.LENGTH_SHORT).show() }
+                    1 -> { svc?.playNext(song);   Toast.makeText(this, getString(R.string.toast_play_next), Toast.LENGTH_SHORT).show() }
                     2 -> showSongInfo(song)
                     3 -> startActivity(Intent(this, RingtoneMakerActivity::class.java).apply {
                             putExtra("songUri", song.uri.toString())
@@ -284,7 +284,7 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
                             runOnUiThread {
                                 allSongs = allSongs.filterNot { it.id == song.id }
                                 adapter.setSongs(adapter.getShown().filterNot { it.id == song.id })
-                                Toast.makeText(this@MainActivity, "Çöp kutusuna taşındı", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@MainActivity, getString(R.string.toast_moved_to_trash), Toast.LENGTH_SHORT).show()
                             }
                         }
                 }
@@ -324,7 +324,7 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
                 svc.pause()
                 handler.postDelayed({ svc.seekTo(lastPos) }, 800)
                 adapter.setPlaying(idx)
-                Toast.makeText(this@MainActivity, "Kaldığın yerden devam ediliyor", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, getString(R.string.toast_resuming), Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -78,7 +78,7 @@ class BlacklistActivity : AppCompatActivity() {
         container.removeAllViews()
         if (paths.isEmpty()) {
             container.addView(TextView(this).apply {
-                text = "Kara listede klasör yok"
+                text = getString(R.string.blacklist_empty)
                 setTextColor(0xFF888888.toInt())
                 textSize = 14f
                 setPadding(0, 24, 0, 24)
@@ -97,7 +97,7 @@ class BlacklistActivity : AppCompatActivity() {
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             })
             row.addView(Button(this).apply {
-                text = "Kaldır"
+                text = getString(R.string.btn_remove)
                 textSize = 12f
                 setOnClickListener {
                     lifecycleScope.launch {

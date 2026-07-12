@@ -312,7 +312,7 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
             Toast.makeText(this, "📼 Retro mod aktif", Toast.LENGTH_SHORT).show()
             lifecycleScope.launch { db.achievementDao().unlock(AchievementEntity("retro")) }
         } else {
-            Toast.makeText(this, "Retro mod kapalı", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_retro_off), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -387,7 +387,7 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
                             songId = song.id, name = name, startMs = startMs, endMs = endMs
                         )
                     )
-                    runOnUiThread { Toast.makeText(this@NowPlayingActivity, "Döngü kaydedildi: $name", Toast.LENGTH_SHORT).show() }
+                    runOnUiThread { Toast.makeText(this@NowPlayingActivity, getString(R.string.toast_loop_saved, name), Toast.LENGTH_SHORT).show() }
                 }
             }
             .setNegativeButton("Vazgeç", null)
@@ -400,7 +400,7 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
             val loops = db.abLoopDao().getForSong(song.id)
             runOnUiThread {
                 if (loops.isEmpty()) {
-                    Toast.makeText(this@NowPlayingActivity, "Bu şarkı için kayıtlı döngü yok", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@NowPlayingActivity, getString(R.string.toast_no_loop), Toast.LENGTH_SHORT).show()
                     return@runOnUiThread
                 }
                 val labels = loops.map { "${it.name} (${fmt(it.startMs)}–${fmt(it.endMs)})" }.toTypedArray()
@@ -457,7 +457,7 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
 
     private fun showEqDialog() {
         val eq = svc?.equalizer ?: run {
-            Toast.makeText(this, "Equalizer kullanılamıyor", Toast.LENGTH_SHORT).show(); return
+            Toast.makeText(this, getString(R.string.toast_eq_unavailable), Toast.LENGTH_SHORT).show(); return
         }
         val numBands   = eq.numberOfBands.toInt()
         val bandLabels = (0 until numBands).map { i ->
@@ -468,12 +468,12 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
         val maxLevel = eq.bandLevelRange[1].toInt()
 
         val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(40,20,40,10) }
-        val enableSwitch = Switch(this).apply { text = "Equalizer Aktif"; isChecked = svc?.eqEnabled ?: false }
-        val bassSwitch   = Switch(this).apply { text = "Bass Boost";      isChecked = svc?.bassBoostEnabled ?: false }
+        val enableSwitch = Switch(this).apply { text = getString(R.string.eq_enabled); isChecked = svc?.eqEnabled ?: false }
+        val bassSwitch   = Switch(this).apply { text = getString(R.string.bass_boost);      isChecked = svc?.bassBoostEnabled ?: false }
         val bassSeek     = SeekBar(this).apply { max = 1000; progress = svc?.bassBoostStrength?.toInt() ?: 500 }
         layout.addView(enableSwitch)
         layout.addView(bassSwitch)
-        layout.addView(TextView(this).apply { text = "Bas Güç" })
+        layout.addView(TextView(this).apply { text = getString(R.string.bass_power) })
         layout.addView(bassSeek)
 
         val seekBars = (0 until numBands).map { i ->
@@ -487,8 +487,8 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
 
         // [8] CdView (Plak) Özelleştirme Seçenekleri
         layout.addView(TextView(this).apply { text = "\nPlak Görünümü"; setPadding(0, 16, 0, 4) })
-        val shimmerSwitch = Switch(this).apply { text = "Parıltı efekti"; isChecked = cdView.shimmerEnabled }
-        val ringsSwitch = Switch(this).apply { text = "Yansıma halkaları"; isChecked = cdView.reflectionRingsEnabled }
+        val shimmerSwitch = Switch(this).apply { text = getString(R.string.shimmer_effect); isChecked = cdView.shimmerEnabled }
+        val ringsSwitch = Switch(this).apply { text = getString(R.string.reflection_rings); isChecked = cdView.reflectionRingsEnabled }
         layout.addView(shimmerSwitch)
         layout.addView(ringsSwitch)
 

@@ -51,7 +51,7 @@ class TrashActivity : AppCompatActivity() {
         container.removeAllViews()
         if (items.isEmpty()) {
             val tv = TextView(this).apply {
-                text = "Çöp kutusu boş"
+                text = getString(R.string.trash_empty)
                 setTextColor(0xFF888888.toInt())
                 textSize = 14f
                 setPadding(0, 24, 0, 24)
@@ -81,7 +81,7 @@ class TrashActivity : AppCompatActivity() {
             row.addView(info)
 
             val restoreBtn = Button(this).apply {
-                text = "Geri Yükle"
+                text = getString(R.string.btn_restore)
                 textSize = 12f
                 setOnClickListener {
                     lifecycleScope.launch {
