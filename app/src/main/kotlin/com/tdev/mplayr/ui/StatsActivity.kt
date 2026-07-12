@@ -52,11 +52,11 @@ class StatsActivity : AppCompatActivity() {
             val totalMs = histDao.getTotalListenedMs()
             val h = TimeUnit.MILLISECONDS.toHours(totalMs)
             val m = TimeUnit.MILLISECONDS.toMinutes(totalMs) % 60
-            findViewById<TextView>(R.id.tvTotalTime).text = "${h}s ${m}dk"
+            findViewById<TextView>(R.id.tvTotalTime).text = getString(R.string.stats_total_time_format, h, m)
         }
         lifecycleScope.launch {
             val count = histDao.getDistinctSongCountSince(monthAgo)
-            findViewById<TextView>(R.id.tvMonthSongs).text = "$count şarkı"
+            findViewById<TextView>(R.id.tvMonthSongs).text = getString(R.string.stats_month_songs_format, count)
         }
         lifecycleScope.launch {
             val hour = histDao.getMostActiveHour()
@@ -72,7 +72,7 @@ class StatsActivity : AppCompatActivity() {
             val maxMs = histDao.getLongestListenMs()
             val m = TimeUnit.MILLISECONDS.toMinutes(maxMs)
             val s = TimeUnit.MILLISECONDS.toSeconds(maxMs) % 60
-            findViewById<TextView>(R.id.tvLongestListen).text = "${m}dk ${s}sn"
+            findViewById<TextView>(R.id.tvLongestListen).text = getString(R.string.stats_longest_format, m, s)
         }
 
         lifecycleScope.launch {

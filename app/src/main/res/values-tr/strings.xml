@@ -69,28 +69,11 @@
     <string name="toast_songs_count">%d şarkı</string>
     <string name="dialog_sound_effects">Ses Efektleri</string>
 
-    <!-- Tools menu -->
-    <string name="tools_title">Araçlar</string>
-    <string name="tools_trash">Çöp Kutusu</string>
-    <string name="tools_blacklist">Klasör Kara Listesi</string>
-    <string name="tools_duplicate">Kopya Şarkı Temizleyici</string>
-    <string name="tools_shake_on">Sallayarak Değiştir: Açık</string>
-    <string name="tools_shake_off">Sallayarak Değiştir: Kapalı</string>
-    <string name="tools_sleep">Hareketsizlikte Uyku Modu</string>
-    <string name="tools_normalize_on">Ses Normalizasyonu: Açık</string>
-    <string name="tools_normalize_off">Ses Normalizasyonu: Kapalı</string>
-    <string name="tools_mono_on">Mono Mod: Açık</string>
-    <string name="tools_mono_off">Mono Mod: Kapalı</string>
-    <string name="tools_silence_on">Sessizlik Kırpma: Açık</string>
-    <string name="tools_silence_off">Sessizlik Kırpma: Kapalı</string>
-    <string name="tools_language">Dil / Language</string>
-    <string name="btn_close">Kapat</string>
-    <string name="btn_cancel">İptal</string>
-    <string name="sleep_dialog_title">Hareketsizlikte Uyku Modu</string>
-    <string name="sleep_off">Kapat</string>
-    <string name="sleep_10min">10 dakika hareketsizlik</string>
-    <string name="sleep_15min">15 dakika</string>
-    <string name="sleep_30min">30 dakika</string>
+    <!-- Stats format strings -->
+    <string name="stats_total_time_format">%ss %ddk</string>
+    <string name="stats_month_songs_format">%d şarkı</string>
+    <string name="stats_longest_format">%ddk %dsn</string>
+</resources>
 
     <!-- Extra strings -->
     <string name="lyrics_position_dynamic">Oynatma konumu: %s</string>
@@ -107,5 +90,3 @@
     <string name="bass_power">Bas Güç</string>
     <string name="shimmer_effect">Parıltı efekti</string>
     <string name="reflection_rings">Yansıma halkaları</string>
-</resources>
-    
