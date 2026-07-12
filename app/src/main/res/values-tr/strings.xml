@@ -68,7 +68,6 @@
     <string name="toast_sleep_timer">%s sonra duracak</string>
     <string name="toast_songs_count">%d şarkı</string>
     <string name="dialog_sound_effects">Ses Efektleri</string>
-</resources>
 
     <!-- Extra strings -->
     <string name="lyrics_position_dynamic">Oynatma konumu: %s</string>
@@ -85,3 +84,5 @@
     <string name="bass_power">Bas Güç</string>
     <string name="shimmer_effect">Parıltı efekti</string>
     <string name="reflection_rings">Yansıma halkaları</string>
+</resources>
+    
