@@ -69,6 +69,10 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
         override fun onServiceDisconnected(n: ComponentName) { bound = false }
     }
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LanguageHelper.applyOnAttach(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -224,7 +228,8 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
             "🌙 Hareketsizlikte Uyku Modu",
             "🔊 Ses Normalizasyonu: ${if (svc?.normalizeEnabled == true) "Açık" else "Kapalı"}",
             "🎧 Mono Mod: ${if (svc?.monoEnabled == true) "Açık" else "Kapalı"}",
-            "✂️ Sessizlik Kırpma: ${if (svc?.silenceTrimEnabled == true) "Açık" else "Kapalı"}"
+            "✂️ Sessizlik Kırpma: ${if (svc?.silenceTrimEnabled == true) "Açık" else "Kapalı"}",
+            "🌍 Dil / Language"
         )
         android.app.AlertDialog.Builder(this)
             .setTitle("Araçlar")
@@ -242,9 +247,28 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
                            Toast.makeText(this, getString(R.string.toast_mono_updated), Toast.LENGTH_SHORT).show() }
                     7 -> { svc?.silenceTrimEnabled = !(svc?.silenceTrimEnabled ?: false)
                            Toast.makeText(this, getString(R.string.toast_silence_updated), Toast.LENGTH_SHORT).show() }
+                    8 -> showLanguageDialog()
                 }
             }
             .setNegativeButton("Kapat", null)
+            .show()
+    }
+
+    private fun showLanguageDialog() {
+        val languages = LanguageHelper.supportedLanguages
+        val names = languages.map { it.second }.toTypedArray()
+        val currentLang = LanguageHelper.getSavedLanguage(this)
+        val currentIndex = languages.indexOfFirst { it.first == currentLang }.coerceAtLeast(0)
+
+        android.app.AlertDialog.Builder(this)
+            .setTitle("🌍 Language / Dil")
+            .setSingleChoiceItems(names, currentIndex) { dialog, i ->
+                val selectedCode = languages[i].first
+                LanguageHelper.setLanguage(this, selectedCode)
+                dialog.dismiss()
+                recreate()
+            }
+            .setNegativeButton("Cancel", null)
             .show()
     }
 
