@@ -90,7 +90,7 @@
 
     <!-- Dialogs -->
     <string name="dialog_sound_effects">Sound Effects</string>
-</resources>
+
 
     <!-- Extra strings -->
     <string name="lyrics_position_dynamic">Playback position: %s</string>
@@ -107,3 +107,4 @@
     <string name="bass_power">Bass Power</string>
     <string name="shimmer_effect">Shimmer effect</string>
     <string name="reflection_rings">Reflection rings</string>
+</resources>
