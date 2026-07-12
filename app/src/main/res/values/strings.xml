@@ -91,6 +91,29 @@
     <!-- Dialogs -->
     <string name="dialog_sound_effects">Sound Effects</string>
 
+    <!-- Tools menu -->
+    <string name="tools_title">Tools</string>
+    <string name="tools_trash">Trash</string>
+    <string name="tools_blacklist">Folder Blacklist</string>
+    <string name="tools_duplicate">Duplicate Song Cleaner</string>
+    <string name="tools_shake_on">Shake to Skip: On</string>
+    <string name="tools_shake_off">Shake to Skip: Off</string>
+    <string name="tools_sleep">Motion Sleep Mode</string>
+    <string name="tools_normalize_on">Audio Normalization: On</string>
+    <string name="tools_normalize_off">Audio Normalization: Off</string>
+    <string name="tools_mono_on">Mono Mode: On</string>
+    <string name="tools_mono_off">Mono Mode: Off</string>
+    <string name="tools_silence_on">Silence Trim: On</string>
+    <string name="tools_silence_off">Silence Trim: Off</string>
+    <string name="tools_language">Language</string>
+    <string name="btn_close">Close</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="sleep_dialog_title">Motion Sleep Mode</string>
+    <string name="sleep_off">Off</string>
+    <string name="sleep_10min">10 minutes of inactivity</string>
+    <string name="sleep_15min">15 minutes</string>
+    <string name="sleep_30min">30 minutes</string>
+
 
     <!-- Extra strings -->
     <string name="lyrics_position_dynamic">Playback position: %s</string>
