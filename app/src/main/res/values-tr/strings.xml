@@ -73,7 +73,7 @@
     <string name="stats_total_time_format">%ss %ddk</string>
     <string name="stats_month_songs_format">%d şarkı</string>
     <string name="stats_longest_format">%ddk %dsn</string>
-</resources>
+
 
     <!-- Extra strings -->
     <string name="lyrics_position_dynamic">Oynatma konumu: %s</string>
@@ -90,3 +90,5 @@
     <string name="bass_power">Bas Güç</string>
     <string name="shimmer_effect">Parıltı efekti</string>
     <string name="reflection_rings">Yansıma halkaları</string>
+   
+    </resources>
