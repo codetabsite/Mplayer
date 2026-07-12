@@ -220,19 +220,24 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
     }
 
     private fun showToolsMenu() {
+        val shakeStr = if (svc?.shakeToSkipEnabled == true) getString(R.string.tools_shake_on) else getString(R.string.tools_shake_off)
+        val normalizeStr = if (svc?.normalizeEnabled == true) getString(R.string.tools_normalize_on) else getString(R.string.tools_normalize_off)
+        val monoStr = if (svc?.monoEnabled == true) getString(R.string.tools_mono_on) else getString(R.string.tools_mono_off)
+        val silenceStr = if (svc?.silenceTrimEnabled == true) getString(R.string.tools_silence_on) else getString(R.string.tools_silence_off)
+
         val opts = arrayOf(
-            "🗑️ Çöp Kutusu",
-            "🚫 Klasör Kara Listesi",
-            "🧹 Kopya Şarkı Temizleyici",
-            "📳 Telefonu Sallayarak Değiştir: ${if (svc?.shakeToSkipEnabled == true) "Açık" else "Kapalı"}",
-            "🌙 Hareketsizlikte Uyku Modu",
-            "🔊 Ses Normalizasyonu: ${if (svc?.normalizeEnabled == true) "Açık" else "Kapalı"}",
-            "🎧 Mono Mod: ${if (svc?.monoEnabled == true) "Açık" else "Kapalı"}",
-            "✂️ Sessizlik Kırpma: ${if (svc?.silenceTrimEnabled == true) "Açık" else "Kapalı"}",
-            "🌍 Dil / Language"
+            getString(R.string.tools_trash),
+            getString(R.string.tools_blacklist),
+            getString(R.string.tools_duplicate),
+            shakeStr,
+            getString(R.string.tools_sleep),
+            normalizeStr,
+            monoStr,
+            silenceStr,
+            getString(R.string.tools_language)
         )
         android.app.AlertDialog.Builder(this)
-            .setTitle("Araçlar")
+            .setTitle(getString(R.string.tools_title))
             .setItems(opts) { _, i ->
                 when (i) {
                     0 -> startActivity(Intent(this, TrashActivity::class.java))
@@ -250,7 +255,7 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
                     8 -> showLanguageDialog()
                 }
             }
-            .setNegativeButton("Kapat", null)
+            .setNegativeButton(getString(R.string.btn_close), null)
             .show()
     }
 
@@ -261,23 +266,28 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
         val currentIndex = languages.indexOfFirst { it.first == currentLang }.coerceAtLeast(0)
 
         android.app.AlertDialog.Builder(this)
-            .setTitle("🌍 Language / Dil")
+            .setTitle(getString(R.string.tools_language))
             .setSingleChoiceItems(names, currentIndex) { dialog, i ->
                 val selectedCode = languages[i].first
                 LanguageHelper.setLanguage(this, selectedCode)
                 dialog.dismiss()
                 recreate()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.btn_cancel), null)
             .show()
     }
 
     /** [3] İvmeölçer ile Akıllı Uyku Modu ayar diyaloğu */
     private fun showSleepMotionDialog() {
-        val opts = arrayOf("Kapat", "10 dakika hareketsizlik", "15 dakika", "30 dakika")
+        val opts = arrayOf(
+            getString(R.string.sleep_off),
+            getString(R.string.sleep_10min),
+            getString(R.string.sleep_15min),
+            getString(R.string.sleep_30min)
+        )
         val mins = intArrayOf(0, 10, 15, 30)
         android.app.AlertDialog.Builder(this)
-            .setTitle("Hareketsizlikte Uyku Modu")
+            .setTitle(getString(R.string.sleep_dialog_title))
             .setItems(opts) { _, i ->
                 if (mins[i] == 0) svc?.stopMotionSleepMode()
                 else svc?.startMotionSleepMode(mins[i])
