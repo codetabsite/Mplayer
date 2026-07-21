@@ -169,7 +169,7 @@ If you like MPlayer:
 - 🌍 Help with translations
 - 📢 Share with friends
 - 🔀 Contribute code
-
+- 🥳 You did it!
 ---
 
 ## 📄 License
