@@ -229,7 +229,12 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
             "🔊 Ses Normalizasyonu: ${if (svc?.normalizeEnabled == true) "Açık" else "Kapalı"}",
             "🎧 Mono Mod: ${if (svc?.monoEnabled == true) "Açık" else "Kapalı"}",
             "✂️ Sessizlik Kırpma: ${if (svc?.silenceTrimEnabled == true) "Açık" else "Kapalı"}",
-            "🌍 Dil / Language"
+            "🌍 Dil / Language",
+            "📁 Klasör Gezgini",
+            "🎵 Playlist Yöneticisi",
+            "🌐 Community Playlist",
+            "📺 TV Modu",
+            "⚡ Power User Modu"
         )
         android.app.AlertDialog.Builder(this)
             .setTitle("Araçlar")
@@ -248,6 +253,11 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
                     7 -> { svc?.silenceTrimEnabled = !(svc?.silenceTrimEnabled ?: false)
                            Toast.makeText(this, getString(R.string.toast_silence_updated), Toast.LENGTH_SHORT).show() }
                     8 -> showLanguageDialog()
+                    9 -> startActivity(Intent(this, FolderExplorerActivity::class.java))
+                    10 -> startActivity(Intent(this, PlaylistActivity::class.java))
+                    11 -> startActivity(Intent(this, CommunityPlaylistActivity::class.java))
+                    12 -> startActivity(Intent(this, TvActivity::class.java))
+                    13 -> startActivity(Intent(this, PowerUserActivity::class.java))
                 }
             }
             .setNegativeButton("Kapat", null)
@@ -288,7 +298,8 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
 
     private fun showSongContextMenu(pos: Int) {
         val song = adapter.get(pos)
-        val opts = arrayOf("Sıraya ekle", "Sonraki çal", "Şarkı bilgisi", "Zil sesi yap", "Çöp kutusuna taşı")
+        val opts = arrayOf("Sıraya ekle", "Sonraki çal", "Şarkı bilgisi", "Zil sesi yap",
+                           "Çöp kutusuna taşı", "Playlist'e ekle", "Tag Düzenle", "Lyrics Düzenle")
         android.app.AlertDialog.Builder(this)
             .setTitle(song.title)
             .setItems(opts) { _, i ->
@@ -311,8 +322,41 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
                                 Toast.makeText(this@MainActivity, getString(R.string.toast_moved_to_trash), Toast.LENGTH_SHORT).show()
                             }
                         }
+                    5 -> showAddToPlaylistDialog(song)
+                    6 -> startActivity(Intent(this, TagEditorActivity::class.java).apply {
+                            putExtra(TagEditorActivity.EXTRA_SONG_IDS, longArrayOf(song.id))
+                        })
+                    7 -> startActivity(Intent(this, LyricsEditorActivity::class.java).apply {
+                            putExtra("songId", song.id)
+                            putExtra("songTitle", song.title)
+                            putExtra("songArtist", song.artist)
+                            putExtra("songUri", song.uri.toString())
+                        })
                 }
             }.show()
+    }
+
+    private fun showAddToPlaylistDialog(song: com.tdev.mplayr.data.Song) {
+        lifecycleScope.launch {
+            val playlists = db.playlistDao().getAll()
+            runOnUiThread {
+                if (playlists.isEmpty()) {
+                    Toast.makeText(this@MainActivity, "No playlists. Create one in Playlist Manager.", Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+                val names = playlists.map { it.name }.toTypedArray()
+                android.app.AlertDialog.Builder(this@MainActivity)
+                    .setTitle("Add to playlist")
+                    .setItems(names) { _, idx ->
+                        val pl = playlists[idx]
+                        lifecycleScope.launch {
+                            val count = db.playlistDao().songCount(pl.id)
+                            db.playlistDao().addSong(com.tdev.mplayr.db.PlaylistSongEntity(pl.id, song.id, count))
+                            runOnUiThread { Toast.makeText(this@MainActivity, "Added to ${pl.name}", Toast.LENGTH_SHORT).show() }
+                        }
+                    }.show()
+            }
+        }
     }
 
     private fun showSongInfo(song: Song) {

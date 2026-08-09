@@ -365,3 +365,51 @@ interface SongGainDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun set(entry: SongGainEntity)
 }
+
+// v5: Song Tag Editor DAO
+@Dao
+interface SongTagDao {
+    @Query("SELECT * FROM song_tags WHERE songId = :songId")
+    suspend fun get(songId: Long): SongTagEntity?
+
+    @Query("SELECT * FROM song_tags WHERE songId = :songId")
+    fun getFlow(songId: Long): Flow<SongTagEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun set(tag: SongTagEntity)
+
+    @Query("DELETE FROM song_tags WHERE songId = :songId")
+    suspend fun delete(songId: Long)
+
+    @Query("SELECT * FROM song_tags WHERE songId IN (:ids)")
+    suspend fun getForSongs(ids: List<Long>): List<SongTagEntity>
+}
+
+// v5: Community Playlists DAO
+@Dao
+interface CommunityPlaylistDao {
+    @Query("SELECT * FROM community_playlists ORDER BY downloadedAt DESC")
+    suspend fun getAll(): List<CommunityPlaylistEntity>
+
+    @Query("SELECT * FROM community_playlists ORDER BY downloadedAt DESC")
+    fun getAllFlow(): Flow<List<CommunityPlaylistEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(pl: CommunityPlaylistEntity)
+
+    @Query("DELETE FROM community_playlists WHERE shareId = :shareId")
+    suspend fun delete(shareId: String)
+
+    @Query("SELECT * FROM community_playlists WHERE shareId = :shareId")
+    suspend fun getById(shareId: String): CommunityPlaylistEntity?
+}
+
+// v5: Power Settings DAO
+@Dao
+interface PowerSettingDao {
+    @Query("SELECT value FROM power_settings WHERE `key` = :key")
+    suspend fun get(key: String): String?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun set(entry: PowerSettingEntity)
+}

@@ -21,9 +21,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         DeletedSongEntity::class,
         BlacklistedFolderEntity::class,
         ABLoopEntity::class,
-        SongGainEntity::class
+        SongGainEntity::class,
+        // v5 additions
+        SongTagEntity::class,
+        CommunityPlaylistEntity::class,
+        PowerSettingEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -39,6 +43,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun blacklistDao(): BlacklistDao
     abstract fun abLoopDao(): ABLoopDao
     abstract fun songGainDao(): SongGainDao
+    // v5
+    abstract fun songTagDao(): SongTagDao
+    abstract fun communityPlaylistDao(): CommunityPlaylistDao
+    abstract fun powerSettingDao(): PowerSettingDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
@@ -135,13 +143,60 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Extend playlists table
+                db.execSQL("ALTER TABLE playlists ADD COLUMN description TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE playlists ADD COLUMN coverPath TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE playlists ADD COLUMN shareId TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE playlists ADD COLUMN isPublic INTEGER NOT NULL DEFAULT 0")
+
+                // Song tag overrides
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS song_tags (
+                        songId INTEGER PRIMARY KEY NOT NULL,
+                        title TEXT NOT NULL DEFAULT '',
+                        artist TEXT NOT NULL DEFAULT '',
+                        album TEXT NOT NULL DEFAULT '',
+                        genre TEXT NOT NULL DEFAULT '',
+                        year TEXT NOT NULL DEFAULT '',
+                        track TEXT NOT NULL DEFAULT '',
+                        coverPath TEXT NOT NULL DEFAULT '',
+                        updatedAt INTEGER NOT NULL
+                    )
+                """)
+
+                // Community playlists cache
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS community_playlists (
+                        shareId TEXT PRIMARY KEY NOT NULL,
+                        name TEXT NOT NULL,
+                        author TEXT NOT NULL,
+                        description TEXT NOT NULL DEFAULT '',
+                        songMetadataJson TEXT NOT NULL DEFAULT '',
+                        downloadedAt INTEGER NOT NULL,
+                        likeCount INTEGER NOT NULL DEFAULT 0,
+                        playCount INTEGER NOT NULL DEFAULT 0
+                    )
+                """)
+
+                // Power settings
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS power_settings (
+                        `key` TEXT PRIMARY KEY NOT NULL,
+                        value TEXT NOT NULL
+                    )
+                """)
+            }
+        }
+
         fun get(ctx: Context): AppDatabase = INSTANCE ?: synchronized(this) {
             INSTANCE ?: Room.databaseBuilder(
                 ctx.applicationContext,
                 AppDatabase::class.java,
                 "mplayr.db"
             )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .build().also { INSTANCE = it }
         }
     }

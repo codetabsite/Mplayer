@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Toolbar -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="56dp"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <ImageButton android:id="@+id/btnBack"
+                android:layout_width="48dp" android:layout_height="48dp"
+                android:src="@drawable/ic_back" android:background="?attr/selectableItemBackgroundBorderless"/>
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Tag Editor"
+                android:textColor="@color/text_primary" android:textSize="18sp" android:fontFamily="sans-serif-medium"/>
+            <Button android:id="@+id/btnSaveTag" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="Save"/>
+        </LinearLayout>
+
+        <TextView android:id="@+id/tvTagMultiHint"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="@color/accent" android:textSize="12sp"
+            android:visibility="gone" android:layout_marginBottom="8dp"/>
+
+        <!-- Cover art -->
+        <ImageView android:id="@+id/ivTagCover"
+            android:layout_width="120dp" android:layout_height="120dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginVertical="12dp"
+            android:src="@drawable/ic_note"
+            android:scaleType="centerCrop"
+            android:background="#22FFFFFF"
+            android:padding="4dp"/>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Tap cover to change" android:textColor="@color/text_dim"
+            android:textSize="11sp" android:gravity="center" android:layout_marginBottom="12dp"/>
+
+        <EditText android:id="@+id/etTagTitle"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="Title" android:textColor="@color/text_primary" android:layout_marginBottom="8dp"/>
+        <EditText android:id="@+id/etTagArtist"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="Artist" android:textColor="@color/text_primary" android:layout_marginBottom="8dp"/>
+        <EditText android:id="@+id/etTagAlbum"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="Album" android:textColor="@color/text_primary" android:layout_marginBottom="8dp"/>
+        <EditText android:id="@+id/etTagGenre"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="Genre" android:textColor="@color/text_primary" android:layout_marginBottom="8dp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <EditText android:id="@+id/etTagYear"
+                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:hint="Year" android:inputType="number"
+                android:textColor="@color/text_primary" android:layout_marginEnd="8dp"/>
+            <EditText android:id="@+id/etTagTrack"
+                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:hint="Track #" android:inputType="number"
+                android:textColor="@color/text_primary"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

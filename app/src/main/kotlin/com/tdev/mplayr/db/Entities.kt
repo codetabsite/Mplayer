@@ -8,7 +8,12 @@ data class PlaylistEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
     val pinned: Boolean = false,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    // v5: playlist export/import & community
+    val description: String = "",
+    val coverPath: String = "",
+    val shareId: String = "",     // community share ID
+    val isPublic: Boolean = false
 )
 
 @Entity(
@@ -60,7 +65,6 @@ data class SavedQueueEntity(
     val createdAt: Long = System.currentTimeMillis()
 )
 
-// [24] Şarkı notu — songId'ye göre 1 not
 @Entity(tableName = "song_notes")
 data class SongNoteEntity(
     @PrimaryKey val songId: Long,
@@ -68,7 +72,6 @@ data class SongNoteEntity(
     val updatedAt: Long = System.currentTimeMillis()
 )
 
-// [22] LRC senkronize söz — satır satır tablo
 @Entity(tableName = "lyrics_lines")
 data class LyricsLineEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -77,7 +80,6 @@ data class LyricsLineEntity(
     val text: String
 )
 
-// [18] Çöp kutusu — silinen şarkı kaydı (uygulama listesinden gizleniyor)
 @Entity(tableName = "deleted_songs")
 data class DeletedSongEntity(
     @PrimaryKey val songId: Long,
@@ -86,13 +88,11 @@ data class DeletedSongEntity(
     val deletedAt: Long = System.currentTimeMillis()
 )
 
-// [27] Kara listeye alınmış klasör yolları
 @Entity(tableName = "blacklisted_folders")
 data class BlacklistedFolderEntity(
     @PrimaryKey val path: String
 )
 
-// [7] İsimlendirilebilir A-B döngü kaydı
 @Entity(tableName = "ab_loops")
 data class ABLoopEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -103,9 +103,42 @@ data class ABLoopEntity(
     val createdAt: Long = System.currentTimeMillis()
 )
 
-// [2] Ses normalizasyonu için hesaplanan kazanç (ReplayGain benzeri, basit peak-based)
 @Entity(tableName = "song_gain")
 data class SongGainEntity(
     @PrimaryKey val songId: Long,
     val gainDb: Float
+)
+
+// v5: Tag editor — overridden metadata per song
+@Entity(tableName = "song_tags")
+data class SongTagEntity(
+    @PrimaryKey val songId: Long,
+    val title: String = "",
+    val artist: String = "",
+    val album: String = "",
+    val genre: String = "",
+    val year: String = "",
+    val track: String = "",
+    val coverPath: String = "",   // local path to overridden cover image
+    val updatedAt: Long = System.currentTimeMillis()
+)
+
+// v5: Community shared playlists cache
+@Entity(tableName = "community_playlists")
+data class CommunityPlaylistEntity(
+    @PrimaryKey val shareId: String,
+    val name: String,
+    val author: String,
+    val description: String = "",
+    val songMetadataJson: String = "", // JSON array of {title,artist,album}
+    val downloadedAt: Long = System.currentTimeMillis(),
+    val likeCount: Int = 0,
+    val playCount: Int = 0
+)
+
+// v5: Power user settings (gapless, replaygain, fade in/out, audio focus, etc.)
+@Entity(tableName = "power_settings")
+data class PowerSettingEntity(
+    @PrimaryKey val key: String,
+    val value: String
 )

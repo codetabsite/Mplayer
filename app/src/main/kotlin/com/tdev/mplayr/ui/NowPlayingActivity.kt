@@ -189,6 +189,7 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
             startActivity(Intent(this, LyricsEditorActivity::class.java).apply {
                 putExtra("songId", song.id)
                 putExtra("songTitle", song.title)
+                putExtra("songArtist", song.artist)
                 putExtra("songUri", song.uri.toString())
             })
         }

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@color/bg">
+
+    <!-- Left panel: Now Playing (large) -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.45"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:gravity="center">
+
+        <ImageButton android:id="@+id/btnTvBack"
+            android:layout_width="40dp" android:layout_height="40dp"
+            android:src="@drawable/ic_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_gravity="start"
+            android:layout_marginBottom="8dp"/>
+
+        <ImageView android:id="@+id/ivTvArt"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_note"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView android:id="@+id/tvTvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No song"
+            android:textColor="@color/text_primary"
+            android:textSize="22sp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:maxLines="2"
+            android:ellipsize="end"/>
+
+        <TextView android:id="@+id/tvTvArtist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_dim"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Seek + time -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:id="@+id/tvTvPos"
+                android:layout_width="48dp" android:layout_height="wrap_content"
+                android:text="0:00" android:textColor="@color/text_dim" android:textSize="13sp"/>
+            <SeekBar android:id="@+id/seekTv"
+                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"/>
+            <TextView android:id="@+id/tvTvDur"
+                android:layout_width="48dp" android:layout_height="wrap_content"
+                android:text="0:00" android:textColor="@color/text_dim" android:textSize="13sp" android:gravity="end"/>
+        </LinearLayout>
+
+        <!-- 10s skip buttons -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center" android:layout_marginTop="8dp">
+            <Button android:id="@+id/btnTvSkipBack"
+                android:layout_width="wrap_content" android:layout_height="36dp"
+                android:text="-10s" android:textSize="12sp" android:layout_marginEnd="4dp"/>
+            <ImageButton android:id="@+id/btnTvPrev"
+                android:layout_width="52dp" android:layout_height="52dp"
+                android:src="@drawable/ic_prev"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+            <ImageButton android:id="@+id/btnTvPlay"
+                android:layout_width="64dp" android:layout_height="64dp"
+                android:src="@drawable/ic_play"
+                android:background="@drawable/bg_play_btn"
+                android:layout_marginHorizontal="8dp"/>
+            <ImageButton android:id="@+id/btnTvNext"
+                android:layout_width="52dp" android:layout_height="52dp"
+                android:src="@drawable/ic_next"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+            <Button android:id="@+id/btnTvSkipFwd"
+                android:layout_width="wrap_content" android:layout_height="36dp"
+                android:text="+10s" android:textSize="12sp" android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+        <!-- Shuffle + Repeat -->
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center" android:layout_marginTop="8dp">
+            <ImageButton android:id="@+id/btnTvShuffle"
+                android:layout_width="40dp" android:layout_height="40dp"
+                android:src="@drawable/ic_shuffle"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:alpha="0.4"/>
+            <ImageButton android:id="@+id/btnTvRepeat"
+                android:layout_width="40dp" android:layout_height="40dp"
+                android:src="@drawable/ic_repeat"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:alpha="0.4"
+                android:layout_marginStart="16dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#22FFFFFF"/>
+
+    <!-- Right panel: Library -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.55"
+        android:orientation="vertical">
+
+        <!-- Tab row -->
+        <LinearLayout android:id="@+id/tvTabRow"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:orientation="horizontal"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTvContent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+</LinearLayout>
