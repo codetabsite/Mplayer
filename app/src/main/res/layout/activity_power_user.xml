@@ -13,7 +13,7 @@
                 android:layout_width="48dp" android:layout_height="48dp"
                 android:src="@drawable/ic_back" android:background="?attr/selectableItemBackgroundBorderless"/>
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="⚡ Power User Mode" android:textColor="@color/text_primary" android:textSize="18sp"/>
+                android:text="Power User" android:textColor="@color/text_primary" android:textSize="18sp"/>
             <Button android:id="@+id/btnSavePower"
                 android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Save"/>
         </LinearLayout>

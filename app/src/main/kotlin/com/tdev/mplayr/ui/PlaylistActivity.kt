@@ -229,7 +229,7 @@ class PlaylistActivity : AppCompatActivity() {
                     db.playlistDao().addSong(PlaylistSongEntity(plId, song.id, i))
                 }
                 loadPlaylists()
-                runOnUiThread { Toast.makeText(this@PlaylistActivity, "Imported ✓", Toast.LENGTH_SHORT).show() }
+                runOnUiThread { Toast.makeText(this@PlaylistActivity, "İçe aktarıldı", Toast.LENGTH_SHORT).show() }
             } catch (e: Exception) {
                 runOnUiThread { Toast.makeText(this@PlaylistActivity, "Import failed: ${e.message}", Toast.LENGTH_SHORT).show() }
             }
@@ -251,7 +251,7 @@ class PlaylistActivity : AppCompatActivity() {
             }
             try {
                 contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { it.write(text) }
-                runOnUiThread { Toast.makeText(this@PlaylistActivity, "Exported ✓", Toast.LENGTH_SHORT).show() }
+                runOnUiThread { Toast.makeText(this@PlaylistActivity, "Dışa aktarıldı", Toast.LENGTH_SHORT).show() }
             } catch (e: Exception) {
                 runOnUiThread { Toast.makeText(this@PlaylistActivity, "Export failed", Toast.LENGTH_SHORT).show() }
             }
@@ -341,7 +341,7 @@ class PlaylistAdapter(
 
     override fun onBindViewHolder(h: VH, pos: Int) {
         val pl = items[pos]
-        h.tvName.text = "${if (pl.pinned) "📌 " else ""}${pl.name}"
+        h.tvName.text = "${if (pl.pinned) "[S] " else ""}${pl.name}"
         h.row.setOnClickListener { onPlay(pl) }
         h.btnMenu.setOnClickListener {
             val opts = arrayOf("Edit name", "Delete", "Export", if (pl.pinned) "Unpin" else "Pin")

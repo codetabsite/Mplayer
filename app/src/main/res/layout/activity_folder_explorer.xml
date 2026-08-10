@@ -22,10 +22,10 @@
         android:orientation="horizontal">
         <Button android:id="@+id/btnPlayFolder"
             android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-            android:text="▶ Play" android:textSize="12sp"/>
+            android:text="Oynat" android:textSize="12sp"/>
         <Button android:id="@+id/btnShuffleFolder"
             android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
-            android:text="⇄ Shuffle" android:textSize="12sp"/>
+            android:text="Karıştır" android:textSize="12sp"/>
         <Button android:id="@+id/btnAddFolderToQueue"
             android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
             android:text="+ Queue" android:textSize="12sp"/>

@@ -126,7 +126,7 @@ class PowerUserActivity : AppCompatActivity() {
             svc?.silenceTrimEnabled = newSettings.skipSilence
             svc?.crossfadeSecs      = newSettings.crossfadeSecs
             runOnUiThread {
-                Toast.makeText(this@PowerUserActivity, "Power settings saved ✓", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@PowerUserActivity, "Ayarlar kaydedildi", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }

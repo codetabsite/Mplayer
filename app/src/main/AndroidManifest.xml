@@ -89,11 +89,12 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- Community Playlists -->
-        <activity android:name=".ui.CommunityPlaylistActivity" android:exported="false" />
 
         <!-- Power User Mode -->
         <activity android:name=".ui.PowerUserActivity" android:exported="false" />
+
+        <!-- Theme Picker -->
+        <activity android:name=".ui.ThemeActivity" android:exported="false" />
 
         <!-- Android TV Mode -->
         <activity

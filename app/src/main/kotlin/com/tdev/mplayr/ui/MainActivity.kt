@@ -19,6 +19,7 @@ import com.google.android.material.tabs.TabLayout
 import com.tdev.mplayr.R
 import com.tdev.mplayr.data.MusicLoader
 import com.tdev.mplayr.data.Song
+import com.tdev.mplayr.ui.ThemeManager
 import com.tdev.mplayr.db.AppDatabase
 import com.tdev.mplayr.service.PlayerService
 import kotlinx.coroutines.launch
@@ -73,12 +74,23 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
         super.attachBaseContext(LanguageHelper.applyOnAttach(newBase))
     }
 
+    // Multi-select toolbar views (set in bindViews)
+    private var selectionBar: android.widget.LinearLayout? = null
+    private var tvSelCount: android.widget.TextView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        applyTheme()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         bindViews()
         observeFavorites()
         checkPermission()
+    }
+
+    private fun applyTheme() {
+        val t = ThemeManager.getSaved(this)
+        window.statusBarColor = t.bg
+        window.navigationBarColor = t.surface
     }
 
     private fun bindViews() {
@@ -96,7 +108,8 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
 
         adapter = SongAdapter(
             onClick      = { pos -> onSongClick(pos) },
-            onLongClick  = { pos -> showSongContextMenu(pos) }
+            onLongClick  = { pos -> if (!adapter.selectionMode) showSongContextMenu(pos) },
+            onSelectionChanged = { ids -> updateSelectionBar(ids) }
         )
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
@@ -221,20 +234,20 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
 
     private fun showToolsMenu() {
         val opts = arrayOf(
-            "🗑️ Çöp Kutusu",
-            "🚫 Klasör Kara Listesi",
-            "🧹 Kopya Şarkı Temizleyici",
-            "📳 Telefonu Sallayarak Değiştir: ${if (svc?.shakeToSkipEnabled == true) "Açık" else "Kapalı"}",
-            "🌙 Hareketsizlikte Uyku Modu",
-            "🔊 Ses Normalizasyonu: ${if (svc?.normalizeEnabled == true) "Açık" else "Kapalı"}",
-            "🎧 Mono Mod: ${if (svc?.monoEnabled == true) "Açık" else "Kapalı"}",
-            "✂️ Sessizlik Kırpma: ${if (svc?.silenceTrimEnabled == true) "Açık" else "Kapalı"}",
-            "🌍 Dil / Language",
-            "📁 Klasör Gezgini",
-            "🎵 Playlist Yöneticisi",
-            "🌐 Community Playlist",
-            "📺 TV Modu",
-            "⚡ Power User Modu"
+            "Çöp Kutusu",
+            "Klasör Kara Listesi",
+            "Kopya Şarkı Temizleyici",
+            "Sallayarak Değiştir: ${if (svc?.shakeToSkipEnabled == true) "Açık" else "Kapalı"}",
+            "Hareketsizlikte Uyku Modu",
+            "Ses Normalizasyonu: ${if (svc?.normalizeEnabled == true) "Açık" else "Kapalı"}",
+            "Mono Mod: ${if (svc?.monoEnabled == true) "Açık" else "Kapalı"}",
+            "Sessizlik Kırpma: ${if (svc?.silenceTrimEnabled == true) "Açık" else "Kapalı"}",
+            "Dil",
+            "Klasör Gezgini",
+            "Playlist Yöneticisi",
+            "TV Modu",
+            "Power User",
+            "Tema"
         )
         android.app.AlertDialog.Builder(this)
             .setTitle("Araçlar")
@@ -255,9 +268,9 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
                     8 -> showLanguageDialog()
                     9 -> startActivity(Intent(this, FolderExplorerActivity::class.java))
                     10 -> startActivity(Intent(this, PlaylistActivity::class.java))
-                    11 -> startActivity(Intent(this, CommunityPlaylistActivity::class.java))
                     12 -> startActivity(Intent(this, TvActivity::class.java))
                     13 -> startActivity(Intent(this, PowerUserActivity::class.java))
+                    14 -> startActivity(Intent(this, ThemeActivity::class.java))
                 }
             }
             .setNegativeButton("Kapat", null)
@@ -271,7 +284,7 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
         val currentIndex = languages.indexOfFirst { it.first == currentLang }.coerceAtLeast(0)
 
         android.app.AlertDialog.Builder(this)
-            .setTitle("🌍 Language / Dil")
+            .setTitle("Dil / Language")
             .setSingleChoiceItems(names, currentIndex) { dialog, i ->
                 val selectedCode = languages[i].first
                 LanguageHelper.setLanguage(this, selectedCode)
@@ -494,6 +507,86 @@ class MainActivity : AppCompatActivity(), PlayerService.Listener {
 
     override fun onResume()  { super.onResume();  handler.post(ticker) }
     override fun onPause()   { super.onPause();   handler.removeCallbacks(ticker) }
+    // ── Multi-select toolbar ──────────────────────────────────────────────
+    private fun buildSelectionBar() {
+        if (selectionBar != null) return
+        val bar = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            setBackgroundColor(0xFF1A1A2E.toInt())
+            setPadding(12, 0, 12, 0)
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 52.dpToPx()
+            )
+        }
+        tvSelCount = android.widget.TextView(this).apply {
+            textSize = 15f; setTextColor(0xFFFFFFFF.toInt())
+            layoutParams = android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        }
+        val btnAll = android.widget.Button(this).apply {
+            text = "Tümü"; textSize = 12f
+            setOnClickListener { adapter.selectAll() }
+        }
+        val btnDelete = android.widget.Button(this).apply {
+            text = "Sil"; textSize = 12f
+            setTextColor(0xFFFF5252.toInt())
+            setOnClickListener { deleteSelected() }
+        }
+        val btnCancel = android.widget.Button(this).apply {
+            text = "İptal"; textSize = 12f
+            setOnClickListener { adapter.exitSelectionMode() }
+        }
+        bar.addView(tvSelCount); bar.addView(btnAll); bar.addView(btnDelete); bar.addView(btnCancel)
+        selectionBar = bar
+
+        // Root layout'a ekle — rvContainer'dan önce
+        val root = findViewById<android.widget.LinearLayout>(R.id.rootLayout)
+        root?.addView(bar, 1)   // toolbar'dan sonra, rv'den önce
+    }
+
+    private fun updateSelectionBar(ids: Set<Long>) {
+        if (ids.isEmpty()) {
+            selectionBar?.visibility = android.view.View.GONE
+        } else {
+            buildSelectionBar()
+            selectionBar?.visibility = android.view.View.VISIBLE
+            tvSelCount?.text = "${ids.size} seçildi"
+        }
+    }
+
+    private fun deleteSelected() {
+        val songs = adapter.getSelectedSongs()
+        if (songs.isEmpty()) return
+        android.app.AlertDialog.Builder(this)
+            .setTitle("${songs.size} şarkıyı sil?")
+            .setMessage("Seçilen şarkılar çöp kutusuna taşınacak.")
+            .setPositiveButton("Sil") { _, _ ->
+                lifecycleScope.launch {
+                    songs.forEach { song ->
+                        db.deletedSongDao().add(
+                            com.tdev.mplayr.db.DeletedSongEntity(song.id, song.title, song.artist)
+                        )
+                    }
+                    val deletedIds = songs.map { it.id }.toSet()
+                    runOnUiThread {
+                        allSongs = allSongs.filterNot { it.id in deletedIds }
+                        adapter.setSongs(adapter.getShown().filterNot { it.id in deletedIds })
+                        adapter.exitSelectionMode()
+                        Toast.makeText(this@MainActivity, "${songs.size} şarkı çöp kutusuna taşındı", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton("İptal", null)
+            .show()
+    }
+
+    private fun Int.dpToPx() = (this * resources.displayMetrics.density).toInt()
+
+    override fun onBackPressed() {
+        if (adapter.selectionMode) { adapter.exitSelectionMode(); return }
+        super.onBackPressed()
+    }
+    // ───────────────────────────────────────────────────────────────────────
+
     override fun onDestroy() {
         super.onDestroy()
         svc?.let { if (it.listener == this) it.listener = null }

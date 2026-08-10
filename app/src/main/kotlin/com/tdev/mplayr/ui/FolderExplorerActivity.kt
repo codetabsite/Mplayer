@@ -196,7 +196,7 @@ class FolderExplorerActivity : AppCompatActivity() {
                 if (newName.isBlank()) return@setPositiveButton
                 val newFile = File(file.parent, "$newName.${file.extension}")
                 if (file.renameTo(newFile)) {
-                    Toast.makeText(this, "Renamed ✓", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Yeniden adlandırıldı", Toast.LENGTH_SHORT).show()
                     loadSongs()
                 } else {
                     Toast.makeText(this, "Rename failed", Toast.LENGTH_SHORT).show()
@@ -216,7 +216,7 @@ class FolderExplorerActivity : AppCompatActivity() {
                         .add(DeletedSongEntity(song.id, song.title, song.artist))
                     runOnUiThread {
                         if (file.delete()) {
-                            Toast.makeText(this@FolderExplorerActivity, "Deleted ✓", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@FolderExplorerActivity, "Silindi", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(this@FolderExplorerActivity, "Could not delete file", Toast.LENGTH_SHORT).show()
                         }
@@ -254,7 +254,7 @@ class FolderAdapter(private val onClick: (String) -> Unit) : RecyclerView.Adapte
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val f = items[position]
-        holder.tv.text = "📁 ${f.name}"
+        holder.tv.text = f.name
         holder.tv.setOnClickListener { onClick(f.absolutePath) }
     }
 
@@ -281,7 +281,7 @@ class FolderSongAdapter(
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val s = items[position]
-        holder.tv.text = "🎵 ${s.title}\n${s.artist} · ${s.formatDuration()}"
+        holder.tv.text = "${s.title}\n${s.artist} · ${s.formatDuration()}"
         holder.tv.setOnClickListener { onPlay(s) }
         holder.tv.setOnLongClickListener { onLongClick(s); true }
     }

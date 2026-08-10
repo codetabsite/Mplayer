@@ -103,7 +103,14 @@ class NowPlayingActivity : AppCompatActivity(), PlayerService.Listener {
         }
     }
 
+    private fun applyTheme() {
+        val t = ThemeManager.getSaved(this)
+        window.statusBarColor = t.bg
+        window.navigationBarColor = t.bg
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        applyTheme()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_now_playing)
 

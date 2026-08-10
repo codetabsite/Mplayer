@@ -231,7 +231,7 @@ class LyricsEditorActivity : AppCompatActivity() {
                     dao.clearForSong(songId)
                     dao.insertLines(parsed.map { LyricsLineEntity(songId = songId, timeMs = it.first, text = it.second) })
                     loadLines()
-                    runOnUiThread { Toast.makeText(this@LyricsEditorActivity, "LRC auto-detected ✓", Toast.LENGTH_SHORT).show() }
+                    runOnUiThread { Toast.makeText(this@LyricsEditorActivity, "LRC bulundu", Toast.LENGTH_SHORT).show() }
                 }
             }
         }
@@ -270,7 +270,7 @@ class LyricsEditorActivity : AppCompatActivity() {
                         dao.clearForSong(songId)
                         dao.insertLines(parsed.map { LyricsLineEntity(songId = songId, timeMs = it.first, text = it.second) })
                         loadLines()
-                        runOnUiThread { Toast.makeText(this@LyricsEditorActivity, "Imported ${parsed.size} lines ✓", Toast.LENGTH_SHORT).show() }
+                        runOnUiThread { Toast.makeText(this@LyricsEditorActivity, "${parsed.size} satır içe aktarıldı", Toast.LENGTH_SHORT).show() }
                     } catch (e: Exception) {
                         runOnUiThread { Toast.makeText(this@LyricsEditorActivity, "Import failed: ${e.message}", Toast.LENGTH_SHORT).show() }
                     }
@@ -282,7 +282,7 @@ class LyricsEditorActivity : AppCompatActivity() {
                     try {
                         val lrcText = buildLrc()
                         contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { it.write(lrcText) }
-                        runOnUiThread { Toast.makeText(this@LyricsEditorActivity, "Exported ✓", Toast.LENGTH_SHORT).show() }
+                        runOnUiThread { Toast.makeText(this@LyricsEditorActivity, "Dışa aktarıldı", Toast.LENGTH_SHORT).show() }
                     } catch (e: Exception) {
                         runOnUiThread { Toast.makeText(this@LyricsEditorActivity, "Export failed: ${e.message}", Toast.LENGTH_SHORT).show() }
                     }

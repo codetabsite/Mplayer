@@ -13,7 +13,8 @@ import com.tdev.mplayr.data.Song
 
 class SongAdapter(
     private val onClick: (Int) -> Unit,
-    private val onLongClick: ((Int) -> Unit)? = null
+    private val onLongClick: ((Int) -> Unit)? = null,
+    private val onSelectionChanged: ((Set<Long>) -> Unit)? = null
 ) : RecyclerView.Adapter<SongAdapter.VH>() {
 
     private var all:       List<Song> = emptyList()
@@ -21,6 +22,44 @@ class SongAdapter(
     private var playingIdx = -1
     var favIds: Set<Long>  = emptySet()
         set(v) { field = v; notifyDataSetChanged() }
+
+    // ── Multi-select state ──────────────────────────────────────────────────
+    var selectionMode = false
+        private set
+    private val selectedIds = mutableSetOf<Long>()
+
+    fun enterSelectionMode(songId: Long) {
+        selectionMode = true
+        selectedIds.clear()
+        selectedIds.add(songId)
+        notifyDataSetChanged()
+        onSelectionChanged?.invoke(selectedIds.toSet())
+    }
+
+    fun exitSelectionMode() {
+        selectionMode = false
+        selectedIds.clear()
+        notifyDataSetChanged()
+        onSelectionChanged?.invoke(emptySet())
+    }
+
+    fun toggleSelection(songId: Long) {
+        if (selectedIds.contains(songId)) selectedIds.remove(songId)
+        else selectedIds.add(songId)
+        notifyDataSetChanged()
+        onSelectionChanged?.invoke(selectedIds.toSet())
+    }
+
+    fun selectAll() {
+        selectedIds.clear()
+        selectedIds.addAll(shown.map { it.id })
+        notifyDataSetChanged()
+        onSelectionChanged?.invoke(selectedIds.toSet())
+    }
+
+    fun getSelectedSongs(): List<Song> = shown.filter { it.id in selectedIds }
+    fun getSelectedIds(): Set<Long> = selectedIds.toSet()
+    // ───────────────────────────────────────────────────────────────────────
 
     fun setSongs(songs: List<Song>) { all = songs; shown = songs; notifyDataSetChanged() }
 
@@ -52,8 +91,18 @@ class SongAdapter(
         val dur:    TextView  = v.findViewById(R.id.tvDur)
         val favDot: View      = v.findViewById(R.id.favDot)
         init {
-            v.setOnClickListener     { onClick(adapterPosition) }
-            v.setOnLongClickListener { onLongClick?.invoke(adapterPosition); true }
+            v.setOnClickListener {
+                if (selectionMode) toggleSelection(shown[adapterPosition].id)
+                else onClick(adapterPosition)
+            }
+            v.setOnLongClickListener {
+                if (!selectionMode) {
+                    enterSelectionMode(shown[adapterPosition].id)
+                } else {
+                    onLongClick?.invoke(adapterPosition)
+                }
+                true
+            }
         }
     }
 
@@ -66,14 +115,38 @@ class SongAdapter(
         h.artist.text = s.artist
         h.dur.text    = s.formatDuration()
         h.favDot.visibility = if (favIds.contains(s.id)) View.VISIBLE else View.GONE
+
         Glide.with(h.art.context)
             .load(s.artUri)
             .placeholder(R.drawable.ic_note).error(R.drawable.ic_note)
             .transition(DrawableTransitionOptions.withCrossFade())
             .centerCrop().into(h.art)
-        val active = pos == playingIdx
+
+        val selected = selectionMode && selectedIds.contains(s.id)
+        val active   = pos == playingIdx && !selectionMode
+
+        h.itemView.setBackgroundColor(
+            when {
+                selected -> 0x3364B5F6.toInt()
+                else     -> 0x00000000
+            }
+        )
         h.itemView.alpha = if (active) 1f else 0.82f
-        h.title.setTextColor(h.itemView.context.getColor(if (active) R.color.accent else R.color.text_primary))
+        h.title.setTextColor(
+            h.itemView.context.getColor(
+                when {
+                    selected -> R.color.accent
+                    active   -> R.color.accent
+                    else     -> R.color.text_primary
+                }
+            )
+        )
+        // Albüm kapağını seçim modunda checkmark overlay ile göster
+        h.art.alpha = if (selected) 0.5f else 1f
+        h.art.setColorFilter(
+            if (selected) 0x8864B5F6.toInt() else 0,
+            android.graphics.PorterDuff.Mode.SRC_ATOP
+        )
     }
 
     override fun getItemCount() = shown.size

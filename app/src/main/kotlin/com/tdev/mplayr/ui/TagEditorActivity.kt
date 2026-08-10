@@ -147,7 +147,7 @@ class TagEditorActivity : AppCompatActivity() {
                 dao.set(updated)
             }
             runOnUiThread {
-                Toast.makeText(this@TagEditorActivity, "Tags saved ✓", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@TagEditorActivity, "Kaydedildi", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
